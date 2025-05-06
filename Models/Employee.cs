@@ -27,5 +27,5 @@ public partial class Employee
 
     public bool? Chronic { get; set; }
 
-    public virtual ICollection<Contract> Contract { get; set; } = new List<Contract>();
+    public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
 }

@@ -21,11 +21,11 @@ public partial class Workplace
 
     public int? HazardLevel { get; set; }
 
-    public virtual ICollection<Accident> Accident { get; set; } = new List<Accident>();
+    public virtual ICollection<Accident> Accidents { get; set; } = new List<Accident>();
 
-    public virtual ICollection<Contract> Contract { get; set; } = new List<Contract>();
+    public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
 
     public virtual Office IdOfficeNavigation { get; set; }
 
-    public virtual ICollection<Staff> IdStaff { get; set; } = new List<Staff>();
+    public virtual ICollection<StaffWorkplace> StaffWorkplaces { get; set; } = new List<StaffWorkplace>();
 }

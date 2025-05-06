@@ -29,9 +29,9 @@ public partial class Accident
 
     public bool? SgkInfoCheck { get; set; }
 
+    public virtual ICollection<AccidentReportStaff> AccidentReportStaffs { get; set; } = new List<AccidentReportStaff>();
+
+    public virtual ICollection<ContractAccident> ContractAccidents { get; set; } = new List<ContractAccident>();
+
     public virtual Workplace IdWorkplaceNavigation { get; set; }
-
-    public virtual ICollection<Contract> IdContract { get; set; } = new List<Contract>();
-
-    public virtual ICollection<Staff> IdStaff { get; set; } = new List<Staff>();
 }

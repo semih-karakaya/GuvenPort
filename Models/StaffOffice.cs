@@ -5,11 +5,13 @@ using System.Collections.Generic;
 
 namespace guvenport.Models;
 
-public partial class Doctor
+public partial class StaffOffice
 {
     public int IdStaff { get; set; }
 
-    public virtual Staff IdStaffNavigation { get; set; }
+    public int IdOffice { get; set; }
 
-    public virtual ICollection<MedicalExamination> MedicalExaminations { get; set; } = new List<MedicalExamination>();
+    public virtual Office IdOfficeNavigation { get; set; }
+
+    public virtual Staff IdStaffNavigation { get; set; }
 }

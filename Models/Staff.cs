@@ -21,13 +21,13 @@ public partial class Staff
 
     public bool? Active { get; set; }
 
+    public virtual ICollection<AccidentReportStaff> AccidentReportStaffs { get; set; } = new List<AccidentReportStaff>();
+
     public virtual Doctor Doctor { get; set; }
 
-    public virtual ICollection<Office> Office { get; set; } = new List<Office>();
+    public virtual ICollection<Office> Offices { get; set; } = new List<Office>();
 
-    public virtual ICollection<Accident> IdAccident { get; set; } = new List<Accident>();
+    public virtual ICollection<StaffOffice> StaffOffices { get; set; } = new List<StaffOffice>();
 
-    public virtual ICollection<Office> IdOffice { get; set; } = new List<Office>();
-
-    public virtual ICollection<Workplace> IdWorkplace { get; set; } = new List<Workplace>();
+    public virtual ICollection<StaffWorkplace> StaffWorkplaces { get; set; } = new List<StaffWorkplace>();
 }

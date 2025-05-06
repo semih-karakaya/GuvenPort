@@ -17,11 +17,11 @@ public partial class Contract
 
     public int? IdEmployee { get; set; }
 
+    public virtual ICollection<ContractAccident> ContractAccidents { get; set; } = new List<ContractAccident>();
+
     public virtual Employee IdEmployeeNavigation { get; set; }
 
     public virtual Workplace IdWorkplaceNavigation { get; set; }
 
-    public virtual ICollection<MedicalExamination> MedicalExamination { get; set; } = new List<MedicalExamination>();
-
-    public virtual ICollection<Accident> IdAccident { get; set; } = new List<Accident>();
+    public virtual ICollection<MedicalExamination> MedicalExaminations { get; set; } = new List<MedicalExamination>();
 }

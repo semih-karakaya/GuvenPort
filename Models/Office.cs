@@ -21,7 +21,7 @@ public partial class Office
 
     public virtual Staff IdManagerstaffNavigation { get; set; }
 
-    public virtual ICollection<Workplace> Workplace { get; set; } = new List<Workplace>();
+    public virtual ICollection<StaffOffice> StaffOffices { get; set; } = new List<StaffOffice>();
 
-    public virtual ICollection<Staff> IdStaff { get; set; } = new List<Staff>();
+    public virtual ICollection<Workplace> Workplaces { get; set; } = new List<Workplace>();
 }
