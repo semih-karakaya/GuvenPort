@@ -7,8 +7,7 @@ namespace demo.webapp.Services.IoC
 
         public static void AddScopedService(this IServiceCollection services)
         {
-            services.AddScoped<IPersonelService, PersonelService>();
-            services.AddScoped<IEducationService, EducationService>();
+         
         }
     }
 }
