@@ -6,6 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+
 
 var connectionString =
     builder.Configuration.GetConnectionString("DefaultConnection")
@@ -16,6 +18,15 @@ builder.Services.AddDbContext<CustomApplicationDbContext>(options =>
 // Register services before building the app
 builder.Services.AddDbContext<CustomApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))));
+builder.Services.AddHttpClient<AuthenticationService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:44384");
+});
+builder.Services.AddHttpClient<DashboardService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:44384");
+});
+
 
 // Build the app after all services are registered
 var app = builder.Build();
@@ -30,11 +41,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.MapRazorPages();
 
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Login}/{action=Index}/{id?}");
 
 app.Run();

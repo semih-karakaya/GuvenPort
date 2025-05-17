@@ -1,0 +1,54 @@
+﻿@model DashboardViewModel
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Active Companies</h5>
+                <p class="card-text display-4">@Model.TotalActiveCompanies</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Active Offices</h5>
+                <p class="card-text display-4">@Model.TotalActiveOffices</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        Hızlı İşlemler
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>İşlem</th>
+                    <th>Git</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Şirket Ekle</td>
+                    <td><a class="btn btn-primary" href="/Company/Add">Git</a></td>
+                </tr>
+                <tr>
+                    <td>Ofis Ekle</td>
+                    <td><a class="btn btn-success" href="/Office/Add">Git</a></td>
+                </tr>
+                <tr>
+                    <td>Şirketleri Listele</td>
+                    <td><a class="btn btn-info" href="/Company/List">Git</a></td>
+                </tr>
+                <tr>
+                    <td>Ofisleri Listele</td>
+                    <td><a class="btn btn-warning" href="/Office/List">Git</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
