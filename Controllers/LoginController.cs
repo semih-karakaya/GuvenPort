@@ -41,7 +41,7 @@ public class LoginController : Controller
                 });
             }
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Dashboard");
         }
 
         ViewBag.Error = "Invalid login attempt.";

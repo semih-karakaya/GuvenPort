@@ -2,19 +2,20 @@
     ViewData["Title"] = "Login";
 }
 <h2>Login</h2>
-<form method="post">
-    <div>
-        <label for="Mail">Mail</label>
-        <input type="text" name="Mail" id="Mail" required />
+<form method="post" style="max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); background-color: #fff;">
+    <div style="margin-bottom: 15px;">
+        <label for="Mail" style="display: block; margin-bottom: 5px;">Mail</label>
+        <input type="text" name="Mail" id="Mail" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;" />
     </div>
-    <div>
-        <label for="Password">Password</label>
-        <input type="password" name="Password" id="Password" required />
+    <div style="margin-bottom: 15px;">
+        <label for="Password" style="display: block; margin-bottom: 5px;">Password</label>
+        <input type="password" name="Password" id="Password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;" />
     </div>
-    <button type="submit">Login</button>
+    <button type="submit" style="width: 100%; padding: 10px; border: none; border-radius: 5px; background-color: #5cb85c; color: white; font-size: 16px; cursor: pointer; transition: background-color 0.3s;">
+        Login
+    </button>
     @if (ViewBag.Error != null)
     {
-        <div style="color:red">@ViewBag.Error</div>
+        <div style="color:red; margin-top: 15px;">@ViewBag.Error</div>
     }
 </form>
-
