@@ -1,29 +1,60 @@
-// Services/AccidentService.cs
-using System.Net.Http.Json;
-using Models.DTOs;
+using Newtonsoft.Json;
+using guvenport.Models;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using guvenport.Models.Interface;
 
-public class AccidentService
+namespace guvenport.Services
 {
-    private readonly HttpClient _httpClient;
-    private const string ApiUrl = "https://your-backend-api-url/api/accidents";
-
-    public AccidentService(HttpClient httpClient)
+    public class AccidentService : IAccidentService
     {
-        _httpClient = httpClient;
+        private readonly HttpClient _httpClient;
+        private readonly IHttpContextAccessor _contextAccessor;
+
+        public AccidentService(HttpClient httpClient, IHttpContextAccessor contextAccessor)
+        {
+            _httpClient = httpClient;
+            _contextAccessor = contextAccessor;
+        }
+
+        public async Task<IEnumerable<AccidentDto>> ListAccidentsAsync()
+        {
+            // Implementation here
+            return new List<AccidentDto>();
+        }
+
+        public async Task AddAccidentAsync(AccidentDto accident)
+        {
+            // Implementation here
+        }
+
+        public async Task<AccidentDto?> GetAccidentByIdAsync(int id)
+        {
+            // Implementation here
+            return null;
+        }
+
+        public async Task<AccidentDto?> UpdateAccidentAsync(AccidentDto accident)
+        {
+            // Implementation here
+            return null;
+        }
+
+        public async Task<bool> DeleteAccidentAsync(int id)
+        {
+            // Implementation here
+            return false;
+        }
     }
-
-    public async Task<List<AccidentDto>> GetAllAsync()
-        => await _httpClient.GetFromJsonAsync<List<AccidentDto>>(ApiUrl);
-
-    public async Task<AccidentDto> GetByIdAsync(int id)
-        => await _httpClient.GetFromJsonAsync<AccidentDto>($"{ApiUrl}/{id}");
-
-    public async Task CreateAsync(AccidentDto accident)
-        => await _httpClient.PostAsJsonAsync(ApiUrl, accident);
-
-    public async Task UpdateAsync(AccidentDto accident)
-        => await _httpClient.PutAsJsonAsync($"{ApiUrl}/{accident.Id}", accident);
-
-    public async Task DeleteAsync(int id)
-        => await _httpClient.DeleteAsync($"{ApiUrl}/{id}");
 }

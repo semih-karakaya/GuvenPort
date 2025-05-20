@@ -1,54 +1,221 @@
 ﻿@model DashboardViewModel
 
-<div class="row mb-4">
-    <div class="col-md-6">
-        <div class="card text-white bg-primary mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Total Active Companies</h5>
-                <p class="card-text display-4">@Model.TotalActiveCompanies</p>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Ofis, Çalışma Yeri ve Aktif Kontrakt Yönetimi</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Toplam Aktif Ofisler</div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.TotalActiveOffices</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Toplam Aktif Çalışma Yerleri</div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.TotalActiveCompanies</h5>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card text-white bg-success mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Total Active Offices</h5>
-                <p class="card-text display-4">@Model.TotalActiveOffices</p>
+
+    <div class="form-group">
+        <label for="officeSelect">Ofis Seçin</label>
+        <div class="input-group">
+            <select id="officeSelect" class="form-control">
+                <option value="">Ofis Seçin...</option>
+                <!-- Ofislerin buraya yükleneceği yer -->
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="workplaceSelect">Çalışma Yeri Seçin</label>
+        <select id="workplaceSelect" class="form-control" disabled>
+            <option value="">Önce bir ofis seçin...</option>
+        </select>
+    </div>
+
+    <div id="employeeNamesContainer" class="mb-4" style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; border-radius: 0.25rem;">
+        <h4>Çalışanlar:</h4>
+        <div id="employeeNames"></div> <!-- Çalışan isimlerinin gösterileceği alan -->
+    </div>
+
+    <button id="addInspectionButton" class="btn btn-primary mt-2" disabled>Muayene Ekle</button>
+
+    <input type="hidden" id="selectedEmployeeIds" /> <!-- Arka planda çalışan ID'lerini tutacak alan -->
+    <input type="hidden" id="selectedContractId" /> <!-- Arka planda kontrakt ID'sini tutacak alan -->
+    <!-- Ana form butonları için modal -->
+    <div class="modal fade" id="mainFormModal" tabindex="-1" role="dialog" aria-labelledby="mainFormModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mainFormModalLabel">Ana Form</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <button class="btn btn-warning btn-block my-2" onclick="location.href='/accident/create'">Kaza Ekle</button>
+                    <button class="btn btn-warning btn-block my-2" onclick="location.href='/accident/list'">Kaza Listele</button>
+                    <button class="btn btn-warning btn-block my-2" onclick="location.href='/MuayeneEkle'">Muayene Ekle</button>
+                    <button class="btn btn-warning btn-block my-2" onclick="location.href='/MuayeneListele'">Muayene Listele</button>
+                    <button class="btn btn-warning btn-block my-2" onclick="location.href='/KisiEkle'">Kişi Ekle</button>
+                    <button class="btn btn-warning btn-block my-2" onclick="location.href='/KisiListele'">Kişi Listele</button>
+                    <button class="btn btn-warning btn-block my-2" onclick="location.href='/KontraktEkle'">Kontrakt Ekle</button>
+                    <button class="btn btn-warning btn-block my-2" onclick="location.href='/KontraktListele'">Kontrakt Listele</button>
+                    <button class="btn btn-warning btn-block my-2" onclick="location.href='/FirmaEkle'">Firma Ekle</button>
+                    <button class="btn btn-warning btn-block my-2" onclick="location.href='/GrupEkle'">Grup Ekle</button>
+                </div>
             </div>
         </div>
+    </div>
+
+    <!-- Ana formu aç butonu -->
+    <div class="form-group mt-4">
+        <button class="btn btn-primary btn-block" id="openMainFormButton" type="button">Ana Formu Aç</button>
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        Hızlı İşlemler
-    </div>
-    <div class="card-body">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>İşlem</th>
-                    <th>Git</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Şirket Ekle</td>
-                    <td><a class="btn btn-primary" href="/Company/Add">Git</a></td>
-                </tr>
-                <tr>
-                    <td>Ofis Ekle</td>
-                    <td><a class="btn btn-success" href="/Office/Add">Git</a></td>
-                </tr>
-                <tr>
-                    <td>Şirketleri Listele</td>
-                    <td><a class="btn btn-info" href="/Company/List">Git</a></td>
-                </tr>
-                <tr>
-                    <td>Ofisleri Listele</td>
-                    <td><a class="btn btn-warning" href="/Office/List">Git</a></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            function loadOffices() {
+                $.ajax({
+                    url: 'https://localhost:44384/api/office/all',
+                    type: 'GET',
+                    success: function (data) {
+                        populateOffices(data);
+                    },
+                    error: function () {
+                        alert('Ofisler yüklenirken bir hata oluştu.');
+                    }
+                });
+            }
+
+            function populateOffices(offices) {
+                $('#officeSelect').empty().append('<option value="">Ofis Seçin...</option>');
+                $.each(offices, function (i, office) {
+                    $('#officeSelect').append('<option value="' + office.id + '">' + office.officeName + '</option>');
+                });
+            }
+
+            $('#officeSelect').on('change', function () {
+                var officeId = $(this).val();
+                $('#workplaceSelect').prop('disabled', !officeId);
+                $('#workplaceSelect').empty().append('<option value="">Çalışma Yeri Seçin...</option>');
+
+                if (officeId) {
+                    loadWorkplaces(officeId);
+                }
+            });
+
+            function loadWorkplaces(officeId) {
+                $.ajax({
+                    url: 'https://localhost:44384/api/office/' + officeId + '/active-workplaces',
+                    type: 'GET',
+                    success: function (data) {
+                        populateWorkplaces(data);
+                    },
+                    error: function () {
+                        alert('Çalışma yerleri yüklenirken bir hata oluştu.');
+                    }
+                });
+            }
+
+            function populateWorkplaces(workplaces) {
+                $.each(workplaces, function (i, workplace) {
+                    $('#workplaceSelect').append('<option value="' + workplace.id + '">' + workplace.name + '</option>');
+                });
+            }
+
+            $('#workplaceSelect').on('change', function () {
+                var workplaceId = $(this).val();
+                $('#employeeNames').empty();
+                $('#addInspectionButton').prop('disabled', true); // Muayene ekle butonunu devre dışı bırak
+
+                if (workplaceId) {
+                    loadEmployeesByWorkplace(workplaceId);
+                }
+            });
+
+            function loadEmployeesByWorkplace(workplaceId) {
+                $.ajax({
+                    url: 'https://localhost:44384/api/contracts/byworkplace/' + workplaceId + '/employees',
+                    type: 'GET',
+                    success: function (data) {
+                        displayEmployeeNames(data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('XHR:', xhr);
+                        console.error('Status:', status);
+                        console.error('Error:', error);
+                        alert('Çalışanlar yüklenirken bir hata oluştu.');
+                    }
+                });
+            }
+
+            function displayEmployeeNames(contracts) {
+                $('#employeeNames').empty(); // Öncelikle mevcut içerikleri temizle
+                let employeeIds = []; // Seçilen çalışan ID'lerini tutacak dizi
+                let contractId = null; // Kontrakt ID'sini tutacak değişken
+                $.each(contracts, function (i, contract) {
+                    if (contract.employees && contract.employees.length > 0) { // Eğer çalışanlar varsa
+                        contractId = contract.id; // Aktif kontraktın ID'sini al
+                        $.each(contract.employees, function (j, employee) {
+                            $('#employeeNames').append('<p>' +
+                            '<button class="employeeBtn btn btn-outline-primary" data-employeeid="' + employee.id + '" style="width: 100%; margin: 5px 0;">' +
+                            employee.name +
+                            '</button></p>');
+                        });
+                    }
+                });
+
+                // Butonlara tıklama olayını bağlayın
+                $('.employeeBtn').on('click', function() {
+                    $('.employeeBtn').css({ // Tüm butonların stilini sıfırlayın
+                        'background-color': 'transparent',
+                        'color': '#007bff'
+                    });
+
+                    // Aktif çalışan butonuna stil ver
+                    $(this).css({
+                        'background-color': '#007bff',
+                        'color': 'white'
+                    });
+
+                    var employeeId = $(this).data('employeeid'); // Butondan employee ID'yi alın
+                    employeeIds = [employeeId]; // Tek bir ID'yi diziye atayın
+                    $('#selectedEmployeeIds').val(employeeIds.join(",")); // ID'leri gizli alana ekle
+                    $('#selectedContractId').val(contractId); // Kontrakt ID'sini de gizli alana ekle
+                    $('#addInspectionButton').prop('disabled', false); // Muayene ekle butonunu etkinleştir
+                });
+
+                // Eğer çalışan varsa muayene ekle butonunu etkinleştir
+                if ($('#employeeNames').children().length > 0) {
+                    $('#addInspectionButton').prop('disabled', false);
+                }
+            }
+
+            // Muayene Ekle butonuna tıklayınca yapılacak işlem
+            $('#addInspectionButton').on('click', function() {
+                var selectedEmployeeIds = $('#selectedEmployeeIds').val();
+                var selectedContractId = $('#selectedContractId').val();
+                // Burada muayene ekleme sayfasına yönlendirebilirsiniz
+                window.location.href = '/MuayeneEkle?employeeId=' + encodeURIComponent(selectedEmployeeIds) + '&contractId=' + encodeURIComponent(selectedContractId);
+            });
+
+            // Ana formu aç butonuna tıklayınca modalı göster
+            $('#openMainFormButton').on('click', function() {
+                $('#mainFormModal').modal('show');
+            });
+
+            loadOffices();
+        });
+    </script>
+}

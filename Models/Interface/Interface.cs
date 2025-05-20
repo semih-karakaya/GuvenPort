@@ -1,0 +1,12 @@
+﻿namespace guvenport.Models.Interface
+{
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using guvenport.Models;
+
+    public interface IAccidentService
+    {
+        Task<IEnumerable<AccidentDto>> ListAccidentsAsync();
+        Task AddAccidentAsync(AccidentDto accident);
+    }
+}

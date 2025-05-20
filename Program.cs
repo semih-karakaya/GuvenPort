@@ -1,5 +1,10 @@
-using guvenport.Models;
+﻿using guvenport.Models;
 using Microsoft.EntityFrameworkCore;
+using guvenport.Models.Interface;
+using guvenport.Services;
+using guvenport.Services;
+using guvenport.Services.IoC;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +31,8 @@ builder.Services.AddHttpClient<DashboardService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:44384");
 });
+builder.Services.AddScopedService();
+builder.Services.AddHttpContextAccessor(); // <-- Add this line
 
 
 // Build the app after all services are registered
@@ -41,7 +48,13 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.MapRazorPages();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapRazorPages(); // Eğer Razor Pages kullanıyorsanız
+});
+
 
 app.UseAuthorization();
 

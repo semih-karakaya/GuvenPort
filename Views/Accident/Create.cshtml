@@ -1,0 +1,120 @@
+﻿@model GuvenPortAPI.Models.AccidentCreateViewModel
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Kaza Ekle</h2>
+
+    <form onsubmit="event.preventDefault(); submitAccidentForm();">
+        <div class="form-group">
+            <label for="accDate">Kaza Tarihi</label>
+            <input type="date" id="accDate" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label for="accTime">Kaza Saati</label>
+            <input type="time" id="accTime" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label for="fatality">Ölüm Durumu</label>
+            <input type="checkbox" id="fatality" class="form-check-input" />
+        </div>
+
+        <div class="form-group">
+            <label for="injury">Yaralanma Durumu</label>
+            <input type="checkbox" id="injury" class="form-check-input" />
+        </div>
+
+        <div class="form-group">
+            <label for="propertyDamage">Mülk Hasarı Durumu</label>
+            <input type="checkbox" id="propertyDamage" class="form-check-input" />
+        </div>
+
+        <div class="form-group">
+            <label for="nearMiss">Yakın Geçiş Durumu</label>
+            <input type="checkbox" id="nearMiss" class="form-check-input" />
+        </div>
+
+        <div class="form-group">
+            <label for="storyOfAccident">Kaza Hikayesi</label>
+            <textarea id="storyOfAccident" class="form-control"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="idWorkplace">Çalışma Yeri Seçin</label>
+            <select id="idWorkplace" class="form-control">
+                <option value="">Çalışma Yeri Seçin...</option>
+                <!-- Çalışma yerleri buraya eklenecek -->
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="sgkInfoDate">SGK Bilgi Tarihi</label>
+            <input type="date" id="sgkInfoDate" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="sgkInfoCheck">SGK Bilgisi Kontrolü</label>
+            <input type="checkbox" id="sgkInfoCheck" class="form-check-input" />
+        </div>
+
+        <div class="form-group">
+            <label for="staffList">Doktorlar:</label>
+            <select id="staffList" class="form-control" multiple>
+                <!-- Doktorlar buraya eklenecek -->
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="contractList">Kontraktlar:</label>
+            <select id="contractList" class="form-control" multiple>
+                <!-- Kontraktlar buraya eklenecek -->
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function submitAccidentForm() {
+            const selectedStaff = [...document.getElementById('staffList').options].filter(option => option.selected).map(option => parseInt(option.value));
+            const selectedContracts = [...document.getElementById('contractList').options].filter(option => option.selected).map(option => parseInt(option.value));
+
+            const accidentData = {
+                accDate: document.getElementById('accDate').value,
+                accTime: document.getElementById('accTime').value,
+                fatality: document.getElementById('fatality').checked,
+                injury: document.getElementById('injury').checked,
+                propertyDamage: document.getElementById('propertyDamage').checked,
+                nearMiss: document.getElementById('nearMiss').checked,
+                storyOfAccident: document.getElementById('storyOfAccident').value,
+                idWorkplace: parseInt(document.getElementById('idWorkplace').value),
+                sgkInfoDate: document.getElementById('sgkInfoDate').value,
+                sgkInfoCheck: document.getElementById('sgkInfoCheck').checked,
+                selectedStaffIds: selectedStaff,
+                selectedContractIds: selectedContracts
+            };
+
+            fetch('https://localhost:44384/api/accident', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(accidentData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Kaza başarıyla kaydedildi!');
+                    // Başka sayfaya yönlendirme veya formu sıfırlama işlemi yapabilirsiniz
+                } else {
+                    throw new Error('Kayıt sırasında hata oluştu.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message);
+            });
+        }
+    </script>
+}

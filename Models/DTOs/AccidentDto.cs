@@ -13,3 +13,4 @@ public class AccidentDto
     public DateOnly? SgkInfoDate { get; set; }
     public bool? SgkInfoCheck { get; set; }
 }
+
