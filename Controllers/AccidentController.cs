@@ -18,10 +18,9 @@ namespace guvenport.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<IActionResult> List()
+        public IActionResult List()
         {
-            var accidents = await _accidentService.ListAccidentsAsync();
-            return View("List", accidents);
+            return View("List");
         }
 
         [HttpGet("create")]

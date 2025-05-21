@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace guvenport.Models;
 
@@ -26,8 +27,10 @@ public partial class MedicalExamination
     public string ExFileLocation { get; set; }
 
     public bool? ExFilePrintedUploaded { get; set; }
+    [JsonIgnore]
 
     public virtual Contract IdContractNavigation { get; set; }
+    [JsonIgnore]
 
     public virtual Doctor IdDoctorNavigation { get; set; }
 }

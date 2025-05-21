@@ -3,7 +3,7 @@
 <div class="container mt-5">
     <h2 class="text-center mb-4">Kaza Ekle</h2>
 
-    <form onsubmit="event.preventDefault(); submitAccidentForm();">
+    <form id="accidentForm">
         <div class="form-group">
             <label for="accDate">Kaza Tarihi</label>
             <input type="date" id="accDate" class="form-control" required />
@@ -40,10 +40,18 @@
         </div>
 
         <div class="form-group">
-            <label for="idWorkplace">Çalışma Yeri Seçin</label>
-            <select id="idWorkplace" class="form-control">
+            <label for="officeSelect">Ofis Seçin</label>
+            <select id="officeSelect" class="form-control">
+                <option value="">Ofis Seçin...</option>
+                <!-- Ofisler buraya dinamik olarak yüklenecek -->
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="workplaceSelect">Çalışma Yeri Seçin</label>
+            <select id="workplaceSelect" class="form-control" disabled>
                 <option value="">Çalışma Yeri Seçin...</option>
-                <!-- Çalışma yerleri buraya eklenecek -->
+                <!-- Çalışma yerleri buraya dinamik olarak yüklenecek -->
             </select>
         </div>
 
@@ -60,41 +68,206 @@
         <div class="form-group">
             <label for="staffList">Doktorlar:</label>
             <select id="staffList" class="form-control" multiple>
-                <!-- Doktorlar buraya eklenecek -->
+                <!-- Doktorlar buraya dinamik olarak yüklenecek -->
             </select>
         </div>
 
         <div class="form-group">
             <label for="contractList">Kontraktlar:</label>
-            <select id="contractList" class="form-control" multiple>
-                <!-- Kontraktlar buraya eklenecek -->
-            </select>
+            <div id="contractList" class="form-control" style="height: 100px; overflow-y: auto;">
+                <!-- Kontraktlar buraya dinamik olarak yüklenecek -->
+            </div>
         </div>
 
+        <input type="hidden" id="selectedEmployeeIds" />
+
         <button type="submit" class="btn btn-primary">Kaydet</button>
+
+        <input type="hidden" id="selectedContractId" />
+
     </form>
 </div>
 
 @section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        function submitAccidentForm() {
-            const selectedStaff = [...document.getElementById('staffList').options].filter(option => option.selected).map(option => parseInt(option.value));
-            const selectedContracts = [...document.getElementById('contractList').options].filter(option => option.selected).map(option => parseInt(option.value));
+        $(document).ready(function () {
+            loadOffices(); // Sayfa yüklendiğinde ofisleri yükle
+
+            $('#officeSelect').on('change', function () {
+                const officeId = $(this).val();
+                $('#workplaceSelect').prop('disabled', !officeId);
+                $('#workplaceSelect').empty().append('<option value="">Çalışma Yeri Seçin...</option>');
+
+                if (officeId) {
+                    loadWorkplaces(officeId);
+                }
+            });
+
+            $('#workplaceSelect').on('change', function () {
+                const workplaceId = $(this).val();
+                $('#staffList').empty(); // Doktor listesini temizle
+                $('#contractList').empty(); // Kontrakt listesini temizle
+
+                if (workplaceId) {
+                    loadStaffByWorkplace(workplaceId);
+                    loadContractsByWorkplace(workplaceId);
+                }
+            });
+
+            $('#accidentForm').on('submit', function (e) {
+                e.preventDefault();
+                submitAccidentForm();
+            });
+        });
+
+        function loadOffices() {
+            $.ajax({
+                url: 'https://localhost:44384/api/office/all',
+                type: 'GET',
+                success: function (data) {
+                    console.log("Ofisler başarıyla yüklendi:", data);
+                    populateOffices(data);
+                },
+                error: function () {
+                    console.error("Ofisler yüklenirken bir hata oluştu.");
+                }
+            });
+        }
+
+        function populateOffices(offices) {
+            $('#officeSelect').empty().append('<option value="">Ofis Seçin...</option>');
+            $.each(offices, function (i, office) {
+                $('#officeSelect').append(`<option value="${office.id}">${office.officeName}</option>`);
+            });
+        }
+
+        function loadWorkplaces(officeId) {
+            $.ajax({
+                url: `https://localhost:44384/api/office/${officeId}/active-workplaces`,
+                type: 'GET',
+                success: function (data) {
+                    populateWorkplaces(data);
+                },
+                error: function () {
+                    alert('Çalışma yerleri yüklenirken bir hata oluştu.');
+                }
+            });
+        }
+
+        function populateWorkplaces(workplaces) {
+            $('#workplaceSelect').empty().append('<option value="">Çalışma Yeri Seçin...</option>');
+            $.each(workplaces, function (i, workplace) {
+                $('#workplaceSelect').append(`<option value="${workplace.id}">${workplace.name}</option>`);
+            });
+        }
+
+        function loadStaffByWorkplace(workplaceId) {
+            $.ajax({
+                url: 'https://localhost:44384/api/staff/ListStaff',
+                type: 'GET',
+                success: function (data) {
+                    populateDoctors(data);
+                },
+                error: function () {
+                    console.error("Doktorlar yüklenirken bir hata oluştu.");
+                }
+            });
+        }
+
+        function populateDoctors(staff) {
+            $('#staffList').empty(); // Mevcut doktor listesini temizle
+            const activeDoctors = staff.filter(doctor => doctor.doctor !== null);
+
+            $.each(activeDoctors, function (i, doctor) {
+                $('#staffList').append(`<option value="${doctor.id}">${doctor.name}</option>`);
+            });
+        }
+
+        function loadContractsByWorkplace(workplaceId) {
+            $.ajax({
+                url: `https://localhost:44384/api/contracts/byworkplace/${workplaceId}/employees`,
+                type: 'GET',
+                success: function (data) {
+                    populateContracts(data);
+                },
+                error: function () {
+                    alert('Kontraktlar yüklenirken bir hata oluştu.');
+                }
+            });
+        }
+
+        function populateContracts(contracts) {
+            $('#contractList').empty(); // Mevcut içerikleri temizle
+
+            $.each(contracts, function (i, contract) {
+                let contractDiv = $('<div>').append(`<strong>${contract.name}</strong>`);
+
+                // Eğer çalışanlar varsa, onları listele
+                if (contract.employees && contract.employees.length > 0) {
+                    let employeeList = $('<ul>'); // Çalışanları listelemek için bir <ul> oluştur
+                    $.each(contract.employees, function (j, employee) {
+                        let employeeItem = $('<li>').text(employee.name)
+                            .append(` <button class="employeeBtn btn btn-outline-primary" data-employeeid="${employee.id}" style="margin-left: 10px;">Seç</button>`); // Seç butonu ekle
+                        employeeList.append(employeeItem); // Çalışanları listeye ekle
+                    });
+                    contractDiv.append(employeeList); // Kontrakt div'ine çalışan listesini ekle
+                }
+                $('#contractList').append(contractDiv); // Kontraktı ana listeye ekle
+            });
+
+            // Seçim butonlarına tıklama olayını bağlayın
+                    $(document).on('click', '.employeeBtn', function (e) {
+            e.preventDefault(); // Formu gönderimini engelle
+            var employeeId = $(this).data('employeeid'); // Butondan employee ID'yi al
+
+            let selectedIds = $('#selectedEmployeeIds').val().split(',').filter(Boolean); // Var olanları al ve boşları filtrele
+
+            // Eğer bu ID daha önce eklenmemişse ekle
+            if (!selectedIds.includes(employeeId.toString())) {
+                selectedIds.push(employeeId);
+                $('#selectedEmployeeIds').val(selectedIds.join(',')); // ID'leri gizli alana ekle
+                $(this).data('selected', true); // Seçildi olarak işaretle
+                $(this).css({'background-color': '#007bff', 'color': 'white'});
+            } else {
+                // Eğer bu ID zaten ekli ise, sil
+                selectedIds = selectedIds.filter(id => id !== employeeId.toString());
+                $('#selectedEmployeeIds').val(selectedIds.join(',')); // ID'leri güncelle
+                $(this).data('selected', false); // Seçim iptal
+                $(this).css({'background-color': '', 'color': ''});
+            }
+        });
+        }
+
+                function submitAccidentForm() {
+            const selectedStaff = [...document.getElementById('staffList').options]
+                .filter(option => option.selected)
+                .map(option => parseInt(option.value));
+
+            // Seçilen kontraktları almak için
+            const selectedContracts = [];
+            $('#contractList .employeeBtn').each(function () {
+                if ($(this).data('selected')) { // Eğer buton seçildiyse
+                    selectedContracts.push(parseInt($(this).data('employeeid')));
+                }
+            });
 
             const accidentData = {
-                accDate: document.getElementById('accDate').value,
-                accTime: document.getElementById('accTime').value,
-                fatality: document.getElementById('fatality').checked,
-                injury: document.getElementById('injury').checked,
-                propertyDamage: document.getElementById('propertyDamage').checked,
-                nearMiss: document.getElementById('nearMiss').checked,
-                storyOfAccident: document.getElementById('storyOfAccident').value,
-                idWorkplace: parseInt(document.getElementById('idWorkplace').value),
-                sgkInfoDate: document.getElementById('sgkInfoDate').value,
-                sgkInfoCheck: document.getElementById('sgkInfoCheck').checked,
+                accDate: $('#accDate').val(),
+                accTime: $('#accTime').val() + ":00",
+                fatality: $('#fatality').is(':checked'),
+                injury: $('#injury').is(':checked'),
+                propertyDamage: $('#propertyDamage').is(':checked'),
+                nearMiss: $('#nearMiss').is(':checked'),
+                storyOfAccident: $('#storyOfAccident').val(),
+                idWorkplace: parseInt($('#workplaceSelect').val()),
+                sgkInfoDate: $('#sgkInfoDate').val(),
+                sgkInfoCheck: $('#sgkInfoCheck').is(':checked'),
                 selectedStaffIds: selectedStaff,
-                selectedContractIds: selectedContracts
+                selectedContractIds: selectedContracts // Burada. Kontrakt ID'leri güncel
             };
+
+            console.log("Gönderilecek veri:", JSON.stringify(accidentData)); // Gönderilecek veriyi logla
 
             fetch('https://localhost:44384/api/accident', {
                 method: 'POST',
@@ -106,9 +279,11 @@
             .then(response => {
                 if (response.ok) {
                     alert('Kaza başarıyla kaydedildi!');
-                    // Başka sayfaya yönlendirme veya formu sıfırlama işlemi yapabilirsiniz
+                    $('#accidentForm')[0].reset(); // Formu sıfırla
                 } else {
-                    throw new Error('Kayıt sırasında hata oluştu.');
+                    return response.json().then(err => {
+                        throw new Error(err.message || 'Kayıt sırasında hata oluştu.');
+                    });
                 }
             })
             .catch(error => {

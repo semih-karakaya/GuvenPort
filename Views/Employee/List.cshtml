@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Çalışan Listesi</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Çalışan Listesi</h1>
+        <table class="table table-striped table-bordered" id="employeeTable">
+            <thead>
+                <tr>
+                    <th>İsim</th>
+                    <th>SSN</th>
+                    <th>Cinsiyet</th>
+                    <th>Kan Grubu</th>
+                    <th>Doğum Tarihi</th>
+                    <th>Engelli</th>
+                    <th>Aktif</th>
+                    <th>Giriş Tarihi</th>
+                    <th>Kronik Hastalık</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- AJAX ile veri yüklenecek -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js" defer></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // DataTable'ı önce başlatıyoruz
+            var table = $('#employeeTable').DataTable();
+            $.noConflict();
+            $.ajax({
+                url: "https://localhost:44384/api/employees/list", // API endpoint
+                method: "GET",
+                success: function(data) {
+                    var rows = [];
+                    data.forEach(function(employee) {
+                        rows.push([
+                            employee.name,
+                            employee.ssn,
+                            employee.sex,
+                            employee.bloodT,
+                            employee.dob.substring(0, 10),
+                            employee.disable ? "Evet" : "Hayır",
+                            employee.active ? "Evet" : "Hayır",
+                            employee.entryDate.substring(0, 10),
+                            employee.chronic ? "Evet" : "Hayır",
+                            `<a class="btn btn-warning btn-sm" href="/employee/update/${employee.id}">Güncelle</a>
+                            <a class="btn btn-danger btn-sm" href="/employee/delete/${employee.id}" onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?');">Sil</a>`
+                        ]);
+                    });
+                    table.clear();
+                    table.rows.add(rows).draw();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Bir hata oluştu: " + error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

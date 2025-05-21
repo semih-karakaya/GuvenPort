@@ -9,4 +9,7 @@
         Task<IEnumerable<AccidentDto>> ListAccidentsAsync();
         Task AddAccidentAsync(AccidentDto accident);
     }
+    public interface IEmployeeService 
+    { 
+    }
 }

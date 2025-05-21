@@ -29,6 +29,9 @@ builder.Services.AddHttpClient<AuthenticationService>(client =>
 builder.Services.AddHttpClient<DashboardService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:44384");
+});builder.Services.AddHttpClient<EmployeeService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:44384");
 });
 builder.Services.AddScopedService();
 builder.Services.AddHttpContextAccessor(); // <-- Add this line
@@ -49,12 +52,8 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-    endpoints.MapRazorPages(); // Eğer Razor Pages kullanıyorsanız
-});
-
+app.MapControllers();
+app.MapRazorPages();
 
 
 app.MapControllerRoute(

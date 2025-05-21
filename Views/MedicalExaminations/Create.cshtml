@@ -1,0 +1,153 @@
+﻿<div class="container mt-5">
+    <h2 class="text-center mb-4">Tıbbi Muayene Ekle</h2>
+
+    <form id="medicalExaminationForm">
+        <div class="form-group">
+            <label for="examinationDate">Muayene Tarihi</label>
+            <input type="date" id="examinationDate" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label for="validityDate">Geçerlilik Tarihi</label>
+            <input type="date" id="validityDate" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label for="doctorSelect">Doktor Seçin</label>
+            <select id="doctorSelect" class="form-control" required>
+                <option value="">Doktor Seçin...</option>
+                <!-- Doktorlar buraya dinamik olarak yüklenecek -->
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="employeeSelect">Çalışan Seçin</label>
+            <select id="employeeSelect" class="form-control" required>
+                <option value="">Çalışan Seçin...</option>
+                <!-- Çalışanlar buraya dinamik olarak yüklenecek -->
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="exFileLocation">Dosya Yeri</label>
+            <input type="text" id="exFileLocation" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="examinationType">Muayene Tipi</label>
+            <select id="examinationType" class="form-control" required>
+                <option value="">Muayene Tipini Seçin...</option>
+                <option value="1">Giriş</option>
+                <option value="2">Periyodik</option>
+                <option value="3">Kaza Sonrası</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="exFilePrinted">Dosya Basıldı</label>
+            <input type="checkbox" id="exFilePrinted" class="form-check-input" />
+        </div>
+
+        <div class="form-group">
+            <label for="exIbys">İBYs</label>
+            <input type="checkbox" id="exIbys" class="form-check-input" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            loadDoctors(); // Doktorları yükle
+            loadEmployees(); // Çalışanları yükle
+
+            $('#medicalExaminationForm').on('submit', function (e) {
+                e.preventDefault();
+                submitMedicalExaminationForm();
+            });
+        });
+
+        function loadDoctors() {
+            $.ajax({
+                url: 'https://localhost:44384/api/doctors/all', // Doktorları çekmek için gidecek URL
+                type: 'GET',
+                success: function (data) {
+                    populateDoctors(data);
+                },
+                error: function () {
+                    console.error("Doktorlar yüklenirken bir hata oluştu.");
+                }
+            });
+        }
+
+        function populateDoctors(doctors) {
+            $('#doctorSelect').empty().append('<option value="">Doktor Seçin...</option>');
+            $.each(doctors, function (i, doctor) {
+                $('#doctorSelect').append(`<option value="${doctor.id}">${doctor.name}</option>`);
+            });
+        }
+
+        function loadEmployees() {
+            $.ajax({
+                url: 'https://localhost:44384/api/employees/all', // Çalışanları çekmek için gidecek URL
+                type: 'GET',
+                success: function (data) {
+                    populateEmployees(data);
+                },
+                error: function () {
+                    console.error("Çalışanlar yüklenirken bir hata oluştu.");
+                }
+            });
+        }
+
+        function populateEmployees(employees) {
+            $('#employeeSelect').empty().append('<option value="">Çalışan Seçin...</option>');
+            $.each(employees, function (i, employee) {
+                $('#employeeSelect').append(`<option value="${employee.id}">${employee.name}</option>`);
+            });
+        }
+
+        function submitMedicalExaminationForm() {
+            const medicalExaminationData = {
+                id: 0,  // Yeni bir kayıt için genellikle 0 kullanırız
+                date: $('#examinationDate').val(),
+                isDisabled: false, // Varsayılan değeri ayarlayın
+                validityDate: $('#validityDate').val(),
+                idContract: 0, // Eğer kontrat kullanmıyorsanız 0 kalabilir
+                idDoctor: parseInt($('#doctorSelect').val()) || 0, // Seçim yapılmadıysa 0
+                exFilePrinted: $('#exFilePrinted').is(':checked'),
+                exIbys: $('#exIbys').is(':checked'),
+                exFileLocation: $('#exFileLocation').val() || "string", // Varsayılan bir değer
+                exFilePrintedUploaded: false, // Varsayılan değeri ayarlayın
+                examination_type: parseInt($('#examinationType').val()) || 0 // Seçim yapılmadıysa 0
+            };
+
+            console.log("Gönderilecek veri:", JSON.stringify(medicalExaminationData)); // Veriyi konsola yazdır
+
+            fetch('https://localhost:44384/api/medicalexamination/AddMedicalExamination', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(medicalExaminationData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Tıbbi muayene başarıyla kaydedildi!');
+                    $('#medicalExaminationForm')[0].reset(); // Formu sıfırla
+                } else {
+                    return response.json().then(err => {
+                        throw new Error(err.message || 'Kayıt sırasında hata oluştu.');
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message);
+            });
+        }
+    </script>
+}

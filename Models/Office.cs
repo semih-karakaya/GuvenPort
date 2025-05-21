@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace guvenport.Models;
 
@@ -18,10 +19,13 @@ public partial class Office
     public bool? Active { get; set; }
 
     public int? IdManagerstaff { get; set; }
+    [JsonIgnore]
 
     public virtual Staff IdManagerstaffNavigation { get; set; }
+    [JsonIgnore]
 
     public virtual ICollection<StaffOffice> StaffOffices { get; set; } = new List<StaffOffice>();
+    [JsonIgnore]
 
     public virtual ICollection<Workplace> Workplaces { get; set; } = new List<Workplace>();
 }

@@ -12,7 +12,8 @@ namespace guvenport.Services.IoC
             // Add all services here
   
             services.AddScoped<IAccidentService, AccidentService>();
-           
+            services.AddScoped<IEmployeeService, EmployeeService>();
+
             // Add other services as needed
         }
     }
