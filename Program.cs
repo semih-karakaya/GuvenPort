@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using guvenport.Models.Interface;
 using guvenport.Services;
-using guvenport.Services;
 using guvenport.Services.IoC;
 
 
@@ -48,6 +47,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
@@ -56,7 +56,6 @@ app.UseEndpoints(endpoints =>
 });
 
 
-app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",

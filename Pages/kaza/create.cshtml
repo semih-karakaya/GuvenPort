@@ -3,7 +3,7 @@
 <div class="container mt-5">
     <h2 class="text-center mb-4">Kaza Ekle</h2>
 
-    <form onsubmit="event.preventDefault(); submitAccidentForm();">
+    <form id="accidentForm">
         <div class="form-group">
             <label for="accDate">Kaza Tarihi</label>
             <input type="date" id="accDate" class="form-control" required />
@@ -90,7 +90,7 @@
             loadOffices(); // Sayfa yüklendiğinde ofisleri yükle
 
             $('#officeSelect').on('change', function () {
-                var officeId = $(this).val();
+                const officeId = $(this).val();
                 $('#workplaceSelect').prop('disabled', !officeId);
                 $('#workplaceSelect').empty().append('<option value="">Çalışma Yeri Seçin...</option>');
 
@@ -102,14 +102,18 @@
             });
 
             $('#workplaceSelect').on('change', function () {
-                var workplaceId = $(this).val();
-                $('#staffList').empty();
-                $('#contractList').empty(); // Kontrakt listesini temizle
+                const workplaceId = $(this).val();
+                $('#staffList, #contractList').empty(); // Doktorlar ve kontrakt listesini temizle
 
                 if (workplaceId) {
                     loadStaffByWorkplace(workplaceId);
                     loadContractsByWorkplace(workplaceId);
                 }
+            });
+
+            $('#accidentForm').on('submit', function (e) {
+                e.preventDefault();
+                submitAccidentForm();
             });
         });
 
@@ -118,10 +122,11 @@
                 url: 'https://localhost:44384/api/office/all',
                 type: 'GET',
                 success: function (data) {
+                    console.log("API başarıyla çağrıldı:", data);
                     populateOffices(data);
                 },
                 error: function () {
-                    alert('Ofisler yüklenirken bir hata oluştu.');
+                    console.error("Ofisler yüklenirken bir hata oluştu.");
                 }
             });
         }
@@ -129,13 +134,13 @@
         function populateOffices(offices) {
             $('#officeSelect').empty().append('<option value="">Ofis Seçin...</option>');
             $.each(offices, function (i, office) {
-                $('#officeSelect').append('<option value="' + office.id + '">' + office.officeName + '</option>');
+                $('#officeSelect').append(`<option value="${office.id}">${office.officeName}</option>`);
             });
         }
 
         function loadWorkplaces(officeId) {
             $.ajax({
-                url: 'https://localhost:44384/api/office/' + officeId + '/active-workplaces',
+                url: `https://localhost:44384/api/office/${officeId}/active-workplaces`,
                 type: 'GET',
                 success: function (data) {
                     populateWorkplaces(data);
@@ -147,14 +152,15 @@
         }
 
         function populateWorkplaces(workplaces) {
+            $('#workplaceSelect').empty().append('<option value="">Çalışma Yeri Seçin...</option>');
             $.each(workplaces, function (i, workplace) {
-                $('#workplaceSelect').append('<option value="' + workplace.id + '">' + workplace.name + '</option>');
+                $('#workplaceSelect').append(`<option value="${workplace.id}">${workplace.name}</option>`);
             });
         }
 
         function loadStaffByWorkplace(workplaceId) {
             $.ajax({
-                url: 'https://localhost:44384/api/accident/staff/' + workplaceId,
+                url: `https://localhost:44384/api/accident/staff/${workplaceId}`,
                 type: 'GET',
                 success: function (data) {
                     populateStaff(data);
@@ -168,13 +174,13 @@
         function populateStaff(staff) {
             $('#staffList').empty();
             $.each(staff, function (i, member) {
-                $('#staffList').append('<option value="' + member.id + '">' + member.name + '</option>');
+                $('#staffList').append(`<option value="${member.id}">${member.name}</option>`);
             });
         }
 
         function loadContractsByWorkplace(workplaceId) {
             $.ajax({
-                url: 'https://localhost:44384/api/accident/contracts/' + workplaceId,
+                url: `https://localhost:44384/api/contracts/byworkplace/${workplaceId}`,
                 type: 'GET',
                 success: function (data) {
                     populateContracts(data);
@@ -188,25 +194,30 @@
         function populateContracts(contracts) {
             $('#contractList').empty();
             $.each(contracts, function (i, contract) {
-                $('#contractList').append('<option value="' + contract.id + '">' + contract.name + '</option>');
+                $('#contractList').append(`<option value="${contract.id}">${contract.name}</option>`);
             });
         }
 
         function submitAccidentForm() {
-            const selectedStaff = [...document.getElementById('staffList').options].filter(option => option.selected).map(option => parseInt(option.value));
-            const selectedContracts = [...document.getElementById('contractList').options].filter(option => option.selected).map(option => parseInt(option.value));
+            const selectedStaff = [...document.getElementById('staffList').options]
+                .filter(option => option.selected)
+                .map(option => parseInt(option.value));
+
+            const selectedContracts = [...document.getElementById('contractList').options]
+                .filter(option => option.selected)
+                .map(option => parseInt(option.value));
 
             const accidentData = {
-                accDate: document.getElementById('accDate').value,
-                accTime: document.getElementById('accTime').value,
-                fatality: document.getElementById('fatality').checked,
-                injury: document.getElementById('injury').checked,
-                propertyDamage: document.getElementById('propertyDamage').checked,
-                nearMiss: document.getElementById('nearMiss').checked,
-                storyOfAccident: document.getElementById('storyOfAccident').value,
-                idWorkplace: parseInt(document.getElementById('workplaceSelect').value), // Çalışma yeri ID'sini al
-                sgkInfoDate: document.getElementById('sgkInfoDate').value,
-                sgkInfoCheck: document.getElementById('sgkInfoCheck').checked,
+                accDate: $('#accDate').val(),
+                accTime: $('#accTime').val(),
+                fatality: $('#fatality').is(':checked'),
+                injury: $('#injury').is(':checked'),
+                propertyDamage: $('#propertyDamage').is(':checked'),
+                nearMiss: $('#nearMiss').is(':checked'),
+                storyOfAccident: $('#storyOfAccident').val(),
+                idWorkplace: parseInt($('#workplaceSelect').val()),
+                sgkInfoDate: $('#sgkInfoDate').val(),
+                sgkInfoCheck: $('#sgkInfoCheck').is(':checked'),
                 selectedStaffIds: selectedStaff,
                 selectedContractIds: selectedContracts
             };
@@ -221,7 +232,8 @@
             .then(response => {
                 if (response.ok) {
                     alert('Kaza başarıyla kaydedildi!');
-                    // Başka sayfaya yönlendirme veya formu sıfırlama işlemi yapabilirsiniz
+                    // Formu sıfırlama işlemi yapmak isterseniz:
+                    $('#accidentForm')[0].reset();
                 } else {
                     throw new Error('Kayıt sırasında hata oluştu.');
                 }

@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -30,31 +29,52 @@ namespace guvenport.Services
 
         public async Task<IEnumerable<AccidentDto>> ListAccidentsAsync()
         {
-            // Implementation here
+            var response = await _httpClient.GetAsync("api/accidents");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<IEnumerable<AccidentDto>>(content) ?? new List<AccidentDto>();
+            }
             return new List<AccidentDto>();
         }
 
         public async Task AddAccidentAsync(AccidentDto accident)
         {
-            // Implementation here
+            var json = JsonConvert.SerializeObject(accident);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync("api/accidents", content);
+            response.EnsureSuccessStatusCode();
         }
 
         public async Task<AccidentDto?> GetAccidentByIdAsync(int id)
         {
-            // Implementation here
+            var response = await _httpClient.GetAsync($"api/accidents/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<AccidentDto>(content);
+            }
             return null;
         }
 
         public async Task<AccidentDto?> UpdateAccidentAsync(AccidentDto accident)
         {
-            // Implementation here
+            var json = JsonConvert.SerializeObject(accident);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync($"api/accidents/{accident.Id}", content);
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<AccidentDto>(responseContent);
+            }
             return null;
         }
 
         public async Task<bool> DeleteAccidentAsync(int id)
         {
-            // Implementation here
-            return false;
+            var response = await _httpClient.DeleteAsync($"api/accidents/{id}");
+            return response.IsSuccessStatusCode;
         }
+
     }
 }
