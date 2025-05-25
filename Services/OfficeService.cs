@@ -18,7 +18,7 @@ public class OfficeService : IOfficeService
         var response = await _httpClient.GetAsync("api/office/list");
         response.EnsureSuccessStatusCode();
         var json = await response.Content.ReadAsStringAsync();
-        var offices = JsonConvert.DeserializeObject<List<OfficeDto>>(json); // Fixed: Use JsonConvert from Newtonsoft.Json
+        var offices = JsonConvert.DeserializeObject<List<OfficeDto>>(json); 
         return offices;
     }
 }

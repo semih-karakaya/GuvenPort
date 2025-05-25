@@ -2,7 +2,7 @@
     ViewData["Title"] = "Tıbbi Muayeneler";
 }
 
-<!-- CSS: Bootstrap4 + DataTables + Buttons -->
+
 <link rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
 <link rel="stylesheet"
@@ -36,7 +36,7 @@
 </div>
 
 @section Scripts {
-    <!-- jQuery, Bootstrap, DataTables, Buttons, js-cookie, FontAwesome -->
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
@@ -92,7 +92,7 @@
             const ctrCalls = ctrIds.map(id =>
               $.ajax({ url:`https://localhost:44384/api/contracts/getnames/${id}`, headers })
                 .done(arr=>{
-                  // arr[0].employees dizisine join
+                  
                   if(Array.isArray(arr) && arr[0] && arr[0].employees){
                     contractMap[id] =
                       arr[0].employees.map(e=>e.name).join(', ');
@@ -100,7 +100,7 @@
                 })
             );
 
-            // Tüm doctor & contract calls tamamlandığında table init et
+            
             $.when(...docCalls, ...ctrCalls).always(()=>{
               initTable(data);
             });
@@ -108,7 +108,7 @@
             alert('Veriler yüklenirken hata oluştu.');
           });
 
-          // Fonksiyon: tabloyu init eder (data: muayene listesi)
+          
           function initTable(data){
             $('#medicalExaminationTable').DataTable({
               data: data,
@@ -163,7 +163,7 @@
             });
           }
 
-          // Sil handler
+         
           $('#medicalExaminationTable').on('click','.btn-delete',function(){
             const id = $(this).data('id');
             if(!confirm('Bu kaydı silmek istediğinize emin misiniz?')) return;
@@ -176,7 +176,7 @@
             });
           });
 
-          // Edit butonu
+          
           window.editExam = function(id){
             window.location.href = '/MedicalExamination/Edit/'+id;
           };

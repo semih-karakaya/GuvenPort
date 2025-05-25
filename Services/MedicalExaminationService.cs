@@ -14,7 +14,7 @@ namespace guvenport.Services
             var httphelpernew = new httpHelpers();
             _httpClient = httphelpernew.HttpHelper(httpClient, contextAccessor);
         }
-        // Implement methods for medical examination service here
+        
     }
         
 }

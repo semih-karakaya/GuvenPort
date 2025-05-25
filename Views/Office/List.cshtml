@@ -106,13 +106,13 @@
                 lengthChange: false
             });
 
-            // Düzenle
+           
             $('#officesTable').on('click', '.btn-edit', function(){
                 var id = $(this).data('id');
                 window.location.href = '/Office/Edit/' + id;
             });
 
-            // Sil
+           
             $('#officesTable').on('click', '.btn-delete', function(){
                 var id = $(this).data('id');
                 if (!confirm('Bu ofisi silmek istediğinize emin misiniz?')) return;

@@ -26,18 +26,18 @@ public class LoginController : Controller
             Response.Cookies.Append("authToken", loginResult.Token, new CookieOptions
             {
                 HttpOnly = false,
-                Secure = true, // HTTPS üzerinde çalışmalıdır
+                Secure = true, 
                 SameSite = SameSiteMode.None,
-                Expires = DateTimeOffset.UtcNow.AddHours(1) // Token'ın süresi
+                Expires = DateTimeOffset.UtcNow.AddHours(1) 
             });
 
-            // Kullanıcı adını cookie'ye ekle
+           
             if (!string.IsNullOrEmpty(loginResult.Name))
             {
-                // user_name cookie'sini HttpOnly = false olarak ayarla
+                
                 Response.Cookies.Append("user_name", loginResult.Name, new CookieOptions
                 {
-                    HttpOnly = false, // HttpOnly true ise client-side erişilemez, false yapıldı
+                    HttpOnly = false, 
                     Secure = false,
                     SameSite = SameSiteMode.Lax
                 });
@@ -52,7 +52,7 @@ public class LoginController : Controller
     [HttpGet]
     public async Task<IActionResult> LogoutAsync()
     {
-        // Sadece belli çerezleri silmek isterseniz:
+        
         Response.Cookies.Delete("authToken");
         Response.Cookies.Delete("user_name");
         foreach (var cookie in Request.Cookies.Keys)

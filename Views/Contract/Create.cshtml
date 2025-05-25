@@ -56,7 +56,7 @@
 </div>
 
 @section Scripts {
-    <!-- jQuery, Bootstrap, js-cookie, FontAwesome -->
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
@@ -67,10 +67,10 @@
           const token   = Cookies.get('authToken') || '';
           const headers = { 'Authorization': 'Bearer ' + token };
 
-          // Sayfa açılınca sadece ofisleri yükle
+          
           loadOffices();
 
-          // Ofis değiştiğinde workplace ve employee dropdown'larını temizle / yeniden yükle
+         
           $('#officeSelect').on('change', function(){
             const officeId = $(this).val();
             clearDropdown('#workplaceSelect', 'Çalışma Yeri Seçin...');
@@ -82,7 +82,7 @@
             }
           });
 
-          // Workplace değiştiğinde employee dropdown'u temizle / yükle
+         
           $('#workplaceSelect').on('change', function(){
             const wpId = $(this).val();
             clearDropdown('#employee', 'Çalışan Seçin...');
@@ -93,7 +93,7 @@
             }
           });
 
-          // Form submit
+        
           $('#addEmployeeForm').on('submit', function(e){
             e.preventDefault();
             $('#alertBox').addClass('d-none').text('');
@@ -127,7 +127,7 @@
             });
           });
 
-          // Helper: Ofisleri yükle
+          
           function loadOffices(){
             $.ajax({
               url: 'https://localhost:44384/api/office/all',
@@ -147,7 +147,7 @@
             });
           }
 
-          // Helper: Çalışma yerlerini yükle
+          
           function loadWorkplaces(officeId){
             $.ajax({
               url: `https://localhost:44384/api/office/${officeId}/active-workplaces`,
@@ -168,7 +168,7 @@
             });
           }
 
-          // Helper: Çalışanları yükle
+          
           function loadEmployees(){
             $.ajax({
               url: 'https://localhost:44384/api/employees/list',
@@ -189,13 +189,12 @@
             });
           }
 
-          // Helper: Dropdown temizle ve placeholder ekle
+          
           function clearDropdown(selector, placeholder){
             $(selector).empty()
                        .append(`<option value="">${placeholder}</option>`);
           }
 
-          // Helper: Form reset
           function resetForm(){
             $('#addEmployeeForm')[0].reset();
             $('#addEmployeeForm').removeClass('was-validated');

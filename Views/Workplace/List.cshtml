@@ -46,11 +46,11 @@
 
     <script>
         $(function(){
-          // Auth token ve header
+         
           const token   = Cookies.get('authToken') || '';
           const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
 
-          // 1) Ofisleri çek, map'e koy
+          
           let officeMap = {};
           $.ajax({
             url: 'https://localhost:44384/api/office/all',
@@ -63,10 +63,10 @@
           })
           .fail(function(){
             alert('Ofisler yüklenemedi!');
-            initWorkplaceTable();  // ofis map'i boş da kalsa tabloyu göster
+            initWorkplaceTable();  
           });
 
-          // 2) DataTable'ı başlatan fonksiyon
+          
           let table;
           function initWorkplaceTable(){
             table = $('#workplaceTable').DataTable({
@@ -76,7 +76,7 @@
                 url: 'https://localhost:44384/api/workplace/list',
                 type: 'GET',
                 dataType: 'json',
-                dataSrc: '',            // API direkt dizi dönüyor
+                dataSrc: '',           
                 beforeSend: function(xhr){
                   if(token) xhr.setRequestHeader('Authorization','Bearer '+token);
                 }
@@ -121,7 +121,7 @@
             });
           }
 
-          // 3) Silme butonunu dinle, sil + reload
+          
           $('#workplaceTable').on('click','.btn-delete',function(){
             const id = $(this).data('id');
             if(!confirm('Silmek istediğinize emin misiniz?')) return;
@@ -132,7 +132,7 @@
               headers: headers
             })
             .done(function(){
-              table.ajax.reload(null,false);  // aynı sayfada yenile
+              table.ajax.reload(null,false);  
             })
             .fail(function(){
               alert('Silme işlemi sırasında hata oluştu!');

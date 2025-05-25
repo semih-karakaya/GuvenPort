@@ -60,7 +60,7 @@
     </div>
 </div>
 
-<!-- FontAwesome ikonu için (opsiyonel) -->
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
@@ -70,7 +70,7 @@
       var token   = Cookies.get('authToken') || '',
           headers = { 'Authorization': 'Bearer ' + token };
 
-      // Ofisleri yükle
+      
       $.ajax({
         url: 'https://localhost:44384/api/office/all',
         type: 'GET',
@@ -88,7 +88,7 @@
         }
       });
 
-      // Form submit
+      
       $('#workplaceForm').on('submit', function(e){
         e.preventDefault();
         $('#alertBox').addClass('d-none').text('');
@@ -102,7 +102,7 @@
           idOffice:             parseInt($('#officeSelect').val(), 10)
         };
 
-        // Basit validasyon
+        
         if (!dto.idOffice) {
           $('#alertBox').removeClass('d-none')
                         .text('Lütfen bir ofis seçin.');

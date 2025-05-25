@@ -16,10 +16,10 @@ namespace GuvenPortAPI.Models
         public DateOnly? SgkInfoDate { get; set; }
         public bool? SgkInfoCheck { get; set; }
 
-        // Seçilen doktor ID'leri
+       
         public List<int> SelectedStaffIds { get; set; } = new List<int>();
 
-        // Seçilen kontrakt ID'leri
+       
         public List<int> SelectedContractIds { get; set; } = new List<int>();
     }
 }

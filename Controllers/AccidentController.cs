@@ -10,11 +10,11 @@ namespace guvenport.Controllers
     [Route("accident")]
     public class AccidentController : Controller
     {
-        private readonly IAccidentService _accidentService; // Change type to IAccidentService
+        private readonly IAccidentService _accidentService; 
 
         public AccidentController(IAccidentService accidentService)
         {
-            _accidentService = accidentService; // No change needed here
+            _accidentService = accidentService; 
         }
 
         [HttpGet("list")]

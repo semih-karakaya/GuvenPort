@@ -1,7 +1,7 @@
 ﻿@{
-    Layout = "_Layout";               // veya kendi layout’un
+    Layout = "_Layout";               
     ViewData["Title"] = "Çalışan Güncelle";
-    var empId = ViewBag.EmployeeId;    // Controller’dan gelen id
+    var empId = ViewBag.EmployeeId;    
 }
 
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
@@ -112,7 +112,7 @@
           const form   = $('#employeeForm')[0];
           const $alert = $('#alertBox');
 
-          // 1) Sayfa açılınca GET ile veriyi çekip doldur
+          
           $.ajax({
             url: `https://localhost:44384/api/employees/get/${empId}`,
             method: 'GET',
@@ -133,7 +133,7 @@
             }
           });
 
-          // 2) Submit → AJAX PUT
+          
           $('#employeeForm').on('submit', function(e){
             e.preventDefault();
             e.stopPropagation();
@@ -144,7 +144,7 @@
               return;
             }
 
-            // DTO
+            
             const dto = {
               id:         Number(empId),
               name:       $('#name').val().trim(),

@@ -137,7 +137,6 @@
             'Accept': 'text/plain'
           };
 
-          // Form validasyon
           const form = $('#employeeForm')[0];
           $('#employeeForm').on('submit', function(e){
             e.preventDefault();
@@ -148,7 +147,6 @@
               return;
             }
 
-            // Payload
             const employeeData = {
               id: 0,
               name:        $('#name').val().trim(),
@@ -162,7 +160,6 @@
               chronic:     $('#chronic').is(':checked')
             };
 
-            // AJAX POST
             $.ajax({
               url: 'https://localhost:44384/api/employees/add',
               method: 'POST',
@@ -181,13 +178,11 @@
             });
           });
 
-          // Alert helper
           function showAlert(message, type){
             const $box = $('#alertBox');
             $box.removeClass('d-none alert-success alert-danger')
                 .addClass('alert-' + type)
                 .text(message);
-            // 3 saniye sonra gizle
             setTimeout(()=> $box.addClass('d-none'), 3000);
           }
         });

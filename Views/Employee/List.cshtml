@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Çalışan Listesi</title>
 
-    <!-- 1) CSS: Bootstrap, DataTables ve Buttons -->
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
     <link rel="stylesheet"
@@ -35,14 +34,10 @@
         </table>
     </div>
 
-    <!-- 2) JS: jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- 3) JS: Bootstrap Bundle (Popper + Bootstrap JS) -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    <!-- 4) JS: DataTables çekirdek + Bootstrap4 entegrasyonu -->
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
-    <!-- 5) JS: Buttons extension ve bağımlılıkları -->
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.bootstrap4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -51,12 +46,9 @@
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.colVis.min.js"></script>
-    <!-- 6) JS: js-cookie -->
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
-    <!-- 7) JS: FontAwesome (ikonlar için) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 
-    <!-- 8) Kendi DataTable başlatma kodunuz -->
     <script>
         $(document).ready(function () {
           var token = Cookies.get('authToken') || '';
@@ -67,7 +59,7 @@
               url: 'https://localhost:44384/api/employees/list',
               type: 'GET',
               headers: headers,
-              dataSrc: ''  // JSON dizi şeklinde dönüyor
+              dataSrc: ''  
             },
             dom: "<'row mb-2'<'col-sm-6'B><'col-sm-6'f>>" +
                  "<'row'<'col-sm-12'tr>>" +
@@ -144,7 +136,7 @@
             lengthChange: false
           });
 
-          // Sil butonu handler
+          
           $('#employeeTable').on('click', '.btn-delete', function () {
             var id = $(this).data('id');
             if (!confirm('Bu kaydı silmek istediğinize emin misiniz?')) return;

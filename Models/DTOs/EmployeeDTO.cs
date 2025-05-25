@@ -12,6 +12,6 @@
         public bool? Active { get; set; }
         public DateOnly? EntryDate { get; set; }
         public bool? Chronic { get; set; }
-        // Add navigation properties if needed, but without [JsonIgnore]
+       
     }
 }

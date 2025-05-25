@@ -11,7 +11,7 @@
         </div>
         <div class="card-body">
 
-            <!-- Uyarı/Kayıt Hata Kutusu -->
+           
             <div id="alertBox" class="alert alert-danger d-none" role="alert"></div>
 
             <form id="officeForm" novalidate>
@@ -74,7 +74,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
     <script>
-        // Helper: Auth token al
+        
         function getAuthToken(){
           return Cookies.get('authToken') || '';
         }
@@ -83,7 +83,7 @@
           const token   = getAuthToken();
           const headers = { 'Authorization': 'Bearer ' + token };
 
-          // Sayfa açılınca manager listesini doldur
+        
           loadManagers();
 
           function loadManagers(){
@@ -110,12 +110,12 @@
             });
           }
 
-          // Form submit handler
+         
           $('#officeForm').on('submit', function(e){
             e.preventDefault();
             $('#alertBox').addClass('d-none').text('');
 
-            // Basit client-side validasyon
+         
             if (!this.checkValidity()) {
               $(this).addClass('was-validated');
               return;

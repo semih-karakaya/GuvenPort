@@ -9,5 +9,5 @@ public class ContractDto
     public int? IdWorkplace { get; set; }
 
     public int? IdEmployee { get; set; }
-    // Di?er temel alanlar?n?z varsa ekleyebilirsiniz
+   
 }

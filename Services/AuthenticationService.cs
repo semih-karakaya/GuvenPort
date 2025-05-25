@@ -26,7 +26,7 @@ public class AuthenticationService
            "application/json"
        );
 
-        // Send the HTTP POST request
+        
         var response = await _httpClient.PostAsync("api/auth/login", jsonContent);
 
         if (!response.IsSuccessStatusCode)

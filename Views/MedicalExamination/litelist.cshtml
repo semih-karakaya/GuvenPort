@@ -5,11 +5,11 @@
     <title>Muayene Lite Liste</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Bootstrap CSS (isteğe bağlı) -->
+   
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
 
-    <!-- DataTables CSS -->
+   
     <link rel="stylesheet"
           href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
 </head>
@@ -28,19 +28,19 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- AJAX ile dolacak -->
+                
             </tbody>
         </table>
     </div>
 
-    <!-- SCRIPTS -->
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
 
     <script>
         $(function(){
-          // Eğer Authorization gerekiyor ise:
+          
           const token   = Cookies.get('authToken') || '';
           const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
 
@@ -53,7 +53,7 @@
               url: 'https://localhost:44384/api/staffexaminationsummary/list',
               type: 'GET',
               headers: headers,
-              dataSrc: ''   // API doğrudan dizi döndürüyor
+              dataSrc: ''  
             },
             columns: [
               {

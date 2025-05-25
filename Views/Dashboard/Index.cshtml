@@ -7,19 +7,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>@ViewData["Title"] - Ofis Yönetimi</title>
 
-  <!-- Bootstrap 4 -->
   <link rel="stylesheet"
         href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
 
-  <!-- AOS Animations -->
   <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
         rel="stylesheet" />
 
-  <!-- Animate.css (isteğe bağlı ekstra efektler) -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
         rel="stylesheet" />
 
-  <!-- FontAwesome Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
         rel="stylesheet" />
 
@@ -29,7 +25,6 @@
   <div class="container mt-5">
     <h2 class="text-center mb-4">Ofis, Çalışma Yeri ve Aktif Kontrakt Yönetimi</h2>
 
-    <!-- Dashboard Cards -->
     <div class="row mb-4">
       <div class="col-md-6" data-aos="fade-up">
         <div class="card text-white bg-info mb-3">
@@ -53,7 +48,6 @@
       </div>
     </div>
 
-    <!-- Office → Workplace → Employee Selector -->
     <div class="form-group">
       <label for="officeSelect">Ofis Seçin</label>
       <select id="officeSelect" class="form-control">
@@ -75,11 +69,9 @@
       <div id="employeeNames"></div>
     </div>
 
-    <!-- Hidden fields to carry IDs -->
     <input type="hidden" id="selectedEmployeeIds" />
     <input type="hidden" id="selectedContractId" />
 
-    <!-- Ana Form Modal -->
     <div class="modal fade" id="mainFormModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -144,7 +136,6 @@
       </div>
     </div>
 
-    <!-- Aç Ana Form -->
     <div class="form-group mt-4">
       <button id="openMainFormButton"
               class="btn btn-secondary btn-block">
@@ -153,7 +144,6 @@
     </div>
   </div>
 
-  <!-- SCRIPTS -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script
     src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js">
@@ -162,7 +152,6 @@
     src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js">
   </script>
 
-  <!-- Animations & Effects -->
   <script
     src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js">
   </script>
@@ -182,7 +171,6 @@
           const headers = { 'Authorization': 'Bearer ' + token };
           const $btn    = $('#medexListBtn');
 
-          // default geçici bir tıklama atıyoruz ki tıklanmasın
           $btn.prop('disabled', true);
 
           $.ajax({
@@ -191,12 +179,10 @@
             headers: headers
           })
           .done(function(info){
-            // claimIsDoctor true/false
             const targetUrl = info.claimIsDoctor
               ? '/medex/list'
               : '/medex/litelist';
 
-            // butonu aktif et ve tıklanınca ilgili sayfaya git
             $btn.prop('disabled', false)
                 .off('click')
                 .on('click', () => location.href = targetUrl);
@@ -207,10 +193,8 @@
                 .off('click')
                 .on('click', () => location.href = '/medex/list');
           });
-    // 1) Init AOS
     AOS.init({ duration:800, once:true });
 
-    // 2) Count-up effect using Razor-injected values
     const offVal = @Model.TotalActiveOffices;
     const wpVal  = @Model.TotalActiveCompanies;
             const { CountUp } = countUp;
@@ -231,7 +215,7 @@
     });
 
 
-    // Load Offices
+
     function loadOffices(){
       $.ajax({
         url: 'https://localhost:44384/api/office/all',
@@ -249,7 +233,6 @@
       });
     }
 
-    // On Office change  Load Workplaces
     $('#officeSelect').on('change', function(){
       const officeId = $(this).val();
       $('#workplaceSelect')
@@ -277,7 +260,6 @@
       });
     }
 
-    // On Workplace change  Load Employees
     $('#workplaceSelect').on('change', function(){
       const wpId = $(this).val();
       $('#employeeNames').empty();
@@ -316,7 +298,6 @@
         }
       });
 
-      // bind click
       $('.employeeBtn').on('click', function(){
         $('.employeeBtn').removeClass('btn-primary')
                          .addClass('btn-outline-primary');
@@ -330,23 +311,23 @@
         $('#addInspectionButton').prop('disabled', false);
       });
 
-      // if any loaded, enable Add
+
       if ($('#employeeNames').children().length) {
         $('#addInspectionButton').prop('disabled', false);
       }
     }
 
-    // On “Muayene Ekle” click ⇒ Redirect
+
     $('#addInspectionButton').on('click', function(){
       const emp = encodeURIComponent($('#selectedEmployeeIds').val());
       const con = encodeURIComponent($('#selectedContractId').val());
       window.location.href = `/MuayeneEkle?employeeId=${emp}&contractId=${con}`;
     });
 
-    // Open main‐form modal
+
     $('#openMainFormButton').on('click', ()=> $('#mainFormModal').modal('show'));
 
-    // Initial load
+
     loadOffices();
   });
   </script>
