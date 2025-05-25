@@ -21,5 +21,11 @@ namespace guvenport.Controllers
         {
             return View("list");
         }
+        [HttpGet("update/{id}")]
+        public IActionResult Update(int id)
+        {
+            ViewBag.EmployeeId = id;
+            return View();      // Views/Employee/Update.cshtml
+        }
     }
 }

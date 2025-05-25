@@ -2,158 +2,184 @@
     ViewData["Title"] = "Tıbbi Muayeneler";
 }
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" />
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js" defer></script>
+<!-- CSS: Bootstrap4 + DataTables + Buttons -->
+<link rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" />
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap4.min.css" />
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Tıbbi Muayeneler</h2>
-    <table id="medicalExaminationTable" class="display">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Muayene Tarihi</th>
-                <th>Geçerlilik Tarihi</th>
-                <th>Doktor</th>
-                <th>Muayne Edilen</th>
-                <th>Dosya Yeri</th>
-                <th>Muayene Tipi</th>
-                <th>Aksiyonlar</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Tablo içeriği buraya dinamik olarak yüklenecek -->
-        </tbody>
-    </table>
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">Tıbbi Muayeneler</h4>
+        </div>
+        <div class="card-body">
+            <table id="medicalExaminationTable"
+                   class="table table-striped table-bordered w-100">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Muayene Tarihi</th>
+                        <th>Geçerlilik Tarihi</th>
+                        <th>Doktor</th>
+                        <th>Muayene Edilen</th>
+                        <th>Dosya Yeri</th>
+                        <th>Muayene Tipi</th>
+                        <th style="width:120px">Aksiyonlar</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
+    <!-- jQuery, Bootstrap, DataTables, Buttons, js-cookie, FontAwesome -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.colVis.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+
     <script>
-        $(document).ready(function () {
-            const token = Cookies.get('authToken');
-            loadMedicalExaminations(); // Kayıtları yükle
-            $('#medicalExaminationTable').DataTable(); // DataTables ile tabloyu başlat
-        });
+        $(function(){
+          const token = Cookies.get('authToken') || '';
+          const headers = { 'Authorization': 'Bearer ' + token };
 
-        function loadMedicalExaminations() {
-            const token = Cookies.get('authToken');
-            // Muayene kayıtlarını çeken API
-            $.ajax({
-                url: 'https://localhost:44384/api/medicalexamination/ListMedicalExaminations',
-                type: 'GET',
-                headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
-                success: function (data) {
-                    populateTable(data);
-                },
-                error: function () {
-                    console.error("Kayıtlar yüklenirken bir hata oluştu.");
-                }
+          
+          let workplaceMap = {};
+         
+          let doctorMap = {};
+         
+          let contractMap = {};
+
+         
+          const unique = arr => [...new Set(arr)];
+
+         
+          $.when(
+           
+            $.ajax({ url: 'https://localhost:44384/api/workplace/list', headers, dataType:'json' })
+              .done(list => list.forEach(o => workplaceMap[o.id]=o.officeName)),
+            
+            $.ajax({ url: 'https://localhost:44384/api/medicalexamination/ListMedicalExaminations', headers, dataType:'json' })
+          ).then((_, exams) => {
+            
+            const data = exams[0];
+
+          
+            const docIds = unique(data.map(x=>x.idDoctor));
+            const ctrIds = unique(data.map(x=>x.idContract));
+
+            
+            const docCalls = docIds.map(id =>
+              $.ajax({ url:`https://localhost:44384/api/staff/GetStaff/${id}`, headers })
+                .done(s=>doctorMap[id]= s.name || '—')
+            );
+            const ctrCalls = ctrIds.map(id =>
+              $.ajax({ url:`https://localhost:44384/api/contracts/getnames/${id}`, headers })
+                .done(arr=>{
+                  // arr[0].employees dizisine join
+                  if(Array.isArray(arr) && arr[0] && arr[0].employees){
+                    contractMap[id] =
+                      arr[0].employees.map(e=>e.name).join(', ');
+                  }
+                })
+            );
+
+            // Tüm doctor & contract calls tamamlandığında table init et
+            $.when(...docCalls, ...ctrCalls).always(()=>{
+              initTable(data);
             });
-        }
+          }).fail(()=>{
+            alert('Veriler yüklenirken hata oluştu.');
+          });
 
-                function populateTable(examinations) {
-            const tableBody = $('#medicalExaminationTable tbody');
-            tableBody.empty(); // Önceki içeriği temizle
-
-            $.each(examinations, function (i, examination) {
-                const examinationType = getExaminationTypeName(examination.examinationType); // Güncellenen "examinationType" alanının kullanımı
-
-                // Doktor adını almak için API çağrısı
-                loadDoctorName(examination.idDoctor).done(function(doctorNameResponse) {
-                    const doctorName = doctorNameResponse.name || "Belirtilmemiş"; // Doktor adını al, yoksa varsayılan değer kullan
-
-                    // Kontrat çalışan isimlerini almak için API çağrısını yap
-                    loadContractEmployeeNames(examination.idContract).done(function(employeeResponse) {
-                        if (Array.isArray(employeeResponse) && employeeResponse.length > 0 && employeeResponse[0].employees) {
-                            const employeeNames = employeeResponse[0].employees.map(emp => emp.name || "İsim Bulunamadı").join(', ');
-
-                            tableBody.append(`
-                                <tr>
-                                    <td>${examination.id}</td>
-                                    <td>${examination.date}</td>
-                                    <td>${examination.validityDate}</td>
-                                    <td>${doctorName}</td>
-                                    <td>${employeeNames}</td>
-                                    <td>${examination.exFileLocation}</td>
-                                    <td>${examinationType}</td>
-                                    <td>
-                                        <button class="btn btn-warning btn-sm" onclick="editExamination(${examination.id})">Güncelle</button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteExamination(${examination.id})">Sil</button>
-                                    </td>
-                                </tr>
-                            `);
-                        } else {
-                            console.error("Çalışan verisi alınamadı:", employeeResponse);
-                        }
-                    });
-                });
-            });
-        }
-
-
-        function loadDoctorName(doctorId) {
-            const token = Cookies.get('authToken');
-            return $.ajax({
-                url: `https://localhost:44384/api/staff/GetStaff/${doctorId}`, // Doktor için API çağrısı
-                type: 'GET',
-                headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
-            });
-        }
-
-        function loadContractEmployeeNames(contractId) {
-            const token = Cookies.get('authToken');
-            return $.ajax({
-                url: `https://localhost:44384/api/contracts/getnames/${contractId}`, // Çalışan isimlerini almak için API çağrısı
-                type: 'GET',
-                headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
-            });
-        }
-
-        function getExaminationTypeName(type) {
-            switch(type) {
-                case 1: return "Giriş";
-                case 2: return "Periyodik";
-                case 3: return "Kaza Sonrası";
-                default: return "Belirtilmemiş";
-            }
-        }
-
-        function editExamination(id) {
-            // Güncelleme formunu aç veya yeni bir sayfaya yönlendirme
-            alert(`Güncelleme için ID: ${id}`);
-            // Burada güncelleme işlemini gerçekleştirin.
-        }
-
-        function deleteExamination(id) {
-            const token = Cookies.get('authToken');
-            if(confirm("Bu kaydı silmek istediğinizden emin misiniz?")) {
-                $.ajax({
-                    url: `https://localhost:44384/api/medicalexamination/${id}`,
-                    type: 'DELETE',
-                    headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
-                    success: function () {
-                        loadMedicalExaminations(); // Silme işlemi sonrası tabloyu yeniden yükle
-                        alert("Kayıt başarıyla silindi.");
-                    },
-                    error: function () {
-                        console.error("Silme işlemi sırasında hata oluştu.");
-                        alert("Silme işlemi başarısız.");
+          // Fonksiyon: tabloyu init eder (data: muayene listesi)
+          function initTable(data){
+            $('#medicalExaminationTable').DataTable({
+              data: data,
+              destroy: true,
+              dom: "<'row mb-2'<'col-sm-6'B><'col-sm-6'f>>" +
+                   "<'row'<'col-sm-12'tr>>" +
+                   "<'row mt-2'<'col-sm-5'i><'col-sm-7'p>>",
+              buttons: [
+                { extend:'excelHtml5', text:'<i class="fas fa-file-excel"></i> Excel',
+                  className:'btn btn-sm btn-success', exportOptions:{columns:':not(:last-child)'} },
+                { extend:'pdfHtml5',   text:'<i class="fas fa-file-pdf"></i> PDF',
+                  className:'btn btn-sm btn-danger',  exportOptions:{columns:':not(:last-child)'} },
+                { extend:'print',      text:'<i class="fas fa-print"></i> Yazdır',
+                  className:'btn btn-sm btn-secondary', exportOptions:{columns:':not(:last-child)'} },
+                { extend:'colvis',     text:'<i class="fas fa-columns"></i> Sütunlar',
+                  className:'btn btn-sm btn-info' }
+              ],
+              columns: [
+                { data:'id' },
+                { data:'date',
+                  render:d=> d? d.substr(0,10):'' },
+                { data:'validityDate',
+                  render:d=> d? d.substr(0,10):'' },
+                { data:'idDoctor',
+                  render:id=> doctorMap[id] || '—' },
+                { data:'idContract',
+                  render:id=> contractMap[id] || '—' },
+                { data:'exFileLocation' },
+                { data:'examinationType',
+                  render:t=>{
+                    switch(t){
+                      case 1: return 'Giriş';
+                      case 2: return 'Periyodik';
+                      case 3: return 'Kaza Sonrası';
+                      default: return 'Belirtilmemiş';
                     }
-                });
-            }
-        }
+                  }
+                },
+                { data:'id',
+                  orderable:false,
+                  searchable:false,
+                  render:id =>
+                    `<button class="btn btn-sm btn-warning mr-1"`
+                    +` onclick="editExam(${id})"><i class="fas fa-edit"></i></button>`
+                    +`<button class="btn btn-sm btn-danger btn-delete"`
+                    +` data-id="${id}"><i class="fas fa-trash"></i></button>`
+                }
+              ],
+              language:{ url:'//cdn.datatables.net/plug-ins/1.13.4/i18n/tr.json' },
+              responsive:true,
+              lengthChange:false
+            });
+          }
+
+          // Sil handler
+          $('#medicalExaminationTable').on('click','.btn-delete',function(){
+            const id = $(this).data('id');
+            if(!confirm('Bu kaydı silmek istediğinize emin misiniz?')) return;
+            $.ajax({
+              url:`https://localhost:44384/api/medicalexamination/${id}`,
+              type:'DELETE',
+              headers,
+              success:()=> $('#medicalExaminationTable').DataTable().ajax.reload(null,false),
+              error:()=> alert('Silme hatası!')
+            });
+          });
+
+          // Edit butonu
+          window.editExam = function(id){
+            window.location.href = '/MedicalExamination/Edit/'+id;
+          };
+        });
     </script>
 }

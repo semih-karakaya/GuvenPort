@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 public class LoginController : Controller
@@ -47,6 +48,21 @@ public class LoginController : Controller
 
         ViewBag.Error = "Invalid login attempt.";
         return View();
+    }
+    [HttpGet]
+    public async Task<IActionResult> LogoutAsync()
+    {
+        // Sadece belli çerezleri silmek isterseniz:
+        Response.Cookies.Delete("authToken");
+        Response.Cookies.Delete("user_name");
+        foreach (var cookie in Request.Cookies.Keys)
+        {
+          Response.Cookies.Delete(cookie);
+        }
+
+     
+
+        return RedirectToAction("Index", "Login");
     }
 
 }

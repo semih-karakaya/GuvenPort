@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using guvenport.Models.Interface;
+using Newtonsoft.Json;
 
-public class OfficeService
+public class OfficeService : IOfficeService
 {
     private readonly HttpClient _httpClient;
     private readonly IHttpContextAccessor _contextAccessor;

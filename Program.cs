@@ -18,10 +18,6 @@ var connectionString =
         ?? throw new InvalidOperationException("Connection string"
         + "'DefaultConnection' not found.");
 
-builder.Services.AddDbContext<CustomApplicationDbContext>(options =>
-// Register services before building the app
-builder.Services.AddDbContext<CustomApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))));
 builder.Services.AddHttpClient<AuthenticationService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:44384");

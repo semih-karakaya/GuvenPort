@@ -2,124 +2,207 @@
     ViewData["Title"] = "Yeni Çalışan Ekle";
 }
 
+<!-- Bootstrap CSS -->
+<link rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Yeni Çalışan Ekle</h2>
-    <form id="addEmployeeForm">
-        <div class="form-group">
-            <label for="startDate">Başlangıç Tarihi</label>
-            <input type="date" class="form-control" id="startDate" required />
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Yeni Çalışan Ekle</h4>
         </div>
-        <div class="form-group">
-            <label for="endDate">Bitiş Tarihi</label>
-            <input type="date" class="form-control" id="endDate" required />
+        <div class="card-body">
+            <div id="alertBox" class="alert alert-danger d-none"></div>
+            <form id="addEmployeeForm" novalidate>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="startDate">Başlangıç Tarihi <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="startDate" required />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="endDate">Bitiş Tarihi <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="endDate" required />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="officeSelect">Ofis Seçin <span class="text-danger">*</span></label>
+                        <select id="officeSelect" class="form-control" required>
+                            <option value="">Ofis Seçin...</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="workplaceSelect">Çalışma Yeri <span class="text-danger">*</span></label>
+                        <select id="workplaceSelect" class="form-control" disabled required>
+                            <option value="">Çalışma Yeri Seçin...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="employee">Çalışan <span class="text-danger">*</span></label>
+                    <select id="employee" class="form-control" disabled required>
+                        <option value="">Çalışan Seçin...</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-block">
+                    <i class="fas fa-plus-circle"></i> Ekle
+                </button>
+            </form>
         </div>
-        <div class="form-group">
-            <label for="workplace">Ofis Seçiniz</label>
-            <select class="form-control" id="workplace" required>
-                <option value="">Seçin</option>
-                <!-- Ofisler buraya dinamik olarak eklenecek -->
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="employee">Çalışan Seçiniz</label>
-            <select class="form-control" id="employee" required>
-                <option value="">Seçin</option>
-                <!-- Çalışanlar buraya dinamik olarak eklenecek -->
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary">Ekle</button>
-    </form>
+    </div>
 </div>
 
 @section Scripts {
+    <!-- jQuery, Bootstrap, js-cookie, FontAwesome -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+
     <script>
-        $(document).ready(function () {
-            const token = Cookies.get('authToken');
-            loadWorkplaces(); // Ofisleri yükle
-            loadEmployees(); // Çalışanları yükle
+        $(function(){
+          const token   = Cookies.get('authToken') || '';
+          const headers = { 'Authorization': 'Bearer ' + token };
 
-            $("#addEmployeeForm").submit(function (event) {
-                event.preventDefault(); // Formun otomatik gönderimini engelle
-                addEmployee(); // Yeni çalışan ekleme fonksiyonunu çağır
-            });
-        });
+          // Sayfa açılınca sadece ofisleri yükle
+          loadOffices();
 
-        function loadWorkplaces() {
-            $.ajax({
-                url: 'https://localhost:44384/api/workplaces', // Ofisleri getiren API
-                type: 'GET',
-                headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
-                success: function (data) {
-                    const workplaceSelect = $('#workplace');
-                    workplaceSelect.empty();
-                    workplaceSelect.append('<option value="">Seçin</option>'); // İlk seçenek boş
-                    $.each(data, function (i, workplace) {
-                        workplaceSelect.append(`<option value="${workplace.id}">${workplace.name}</option>`); // İsim ve ID'sini ekle
-                    });
-                },
-                error: function () {
-                    console.error("Ofisler yüklenirken bir hata oluştu.");
-                }
-            });
-        }
+          // Ofis değiştiğinde workplace ve employee dropdown'larını temizle / yeniden yükle
+          $('#officeSelect').on('change', function(){
+            const officeId = $(this).val();
+            clearDropdown('#workplaceSelect', 'Çalışma Yeri Seçin...');
+            clearDropdown('#employee', 'Çalışan Seçin...');
+            $('#workplaceSelect, #employee').prop('disabled', true);
 
-        function loadEmployees() {
-            $.ajax({
-                url: 'https://localhost:44384/api/employees/list', // Çalışanları getiren API
-                type: 'GET',
-                headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
-                success: function (data) {
-                    const employeeSelect = $('#employee');
-                    employeeSelect.empty();
-                    employeeSelect.append('<option value="">Seçin</option>'); // İlk seçenek boş
-                    $.each(data, function (i, employee) {
-                        employeeSelect.append(`<option value="${employee.id}">${employee.name}</option>`); // İsim ve ID'sini ekle
-                    });
-                },
-                error: function () {
-                    console.error("Çalışanlar yüklenirken bir hata oluştu.");
-                }
-            });
-        }
+            if (officeId) {
+              loadWorkplaces(officeId);
+            }
+          });
 
-        function addEmployee() {
-            const startDate = $("#startDate").val();
-            const endDate = $("#endDate").val();
-            const idWorkplace = $("#workplace").val();
-            const idEmployee = $("#employee").val();
+          // Workplace değiştiğinde employee dropdown'u temizle / yükle
+          $('#workplaceSelect').on('change', function(){
+            const wpId = $(this).val();
+            clearDropdown('#employee', 'Çalışan Seçin...');
+            $('#employee').prop('disabled', true);
 
-            const employeeData = {
-                startDate: startDate,
-                endDate: endDate,
-                idWorkplace: Number(idWorkplace),
-                idEmployee: Number(idEmployee)
+            if (wpId) {
+              loadEmployees();
+            }
+          });
+
+          // Form submit
+          $('#addEmployeeForm').on('submit', function(e){
+            e.preventDefault();
+            $('#alertBox').addClass('d-none').text('');
+
+            if (!this.checkValidity()) {
+              $(this).addClass('was-validated');
+              return;
+            }
+
+            const payload = {
+              startDate:    $('#startDate').val(),
+              endDate:      $('#endDate').val(),
+              idWorkplace:  Number($('#workplaceSelect').val()),
+              idEmployee:   Number($('#employee').val())
             };
 
             $.ajax({
-                url: 'https://localhost:44384/api/contracts/add', // Yeni çalışan ekle
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(employeeData),
-                headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
-                success: function () {
-                    alert("Yeni çalışan başarıyla eklendi!");
-                    $("#addEmployeeForm")[0].reset(); // Formu temizle
-                },
-                error: function () {
-                    console.error("Yeni çalışan eklenirken bir hata oluştu.");
-                }
+              url: 'https://localhost:44384/api/contracts/add',
+              method: 'POST',
+              contentType: 'application/json',
+              headers: headers,
+              data: JSON.stringify(payload),
+              success: function(){
+                alert('Çalışan başarıyla eklendi!');
+                resetForm();
+              },
+              error: function(xhr){
+                const msg = xhr.responseText || xhr.statusText;
+                $('#alertBox').removeClass('d-none').text(msg);
+              }
             });
-        }
+          });
+
+          // Helper: Ofisleri yükle
+          function loadOffices(){
+            $.ajax({
+              url: 'https://localhost:44384/api/office/all',
+              method: 'GET',
+              headers: headers,
+              success: function(data){
+                const $sel = $('#officeSelect').empty()
+                              .append('<option value="">Ofis Seçin...</option>');
+                data.forEach(o => {
+                  $sel.append(`<option value="${o.id}">${o.officeName}</option>`);
+                });
+              },
+              error: function(){
+                $('#alertBox').removeClass('d-none')
+                              .text('Ofisler yüklenirken hata oluştu.');
+              }
+            });
+          }
+
+          // Helper: Çalışma yerlerini yükle
+          function loadWorkplaces(officeId){
+            $.ajax({
+              url: `https://localhost:44384/api/office/${officeId}/active-workplaces`,
+              method: 'GET',
+              headers: headers,
+              success: function(data){
+                const $sel = $('#workplaceSelect').empty()
+                              .append('<option value="">Çalışma Yeri Seçin...</option>')
+                              .prop('disabled', false);
+                data.forEach(w => {
+                  $sel.append(`<option value="${w.id}">${w.name}</option>`);
+                });
+              },
+              error: function(){
+                $('#alertBox').removeClass('d-none')
+                              .text('Çalışma yerleri yüklenemedi!');
+              }
+            });
+          }
+
+          // Helper: Çalışanları yükle
+          function loadEmployees(){
+            $.ajax({
+              url: 'https://localhost:44384/api/employees/list',
+              method: 'GET',
+              headers: headers,
+              success: function(data){
+                const $sel = $('#employee').empty()
+                              .append('<option value="">Çalışan Seçin...</option>')
+                              .prop('disabled', false);
+                data.forEach(emp => {
+                  $sel.append(`<option value="${emp.id}">${emp.name}</option>`);
+                });
+              },
+              error: function(){
+                $('#alertBox').removeClass('d-none')
+                              .text('Çalışanlar yüklenemedi!');
+              }
+            });
+          }
+
+          // Helper: Dropdown temizle ve placeholder ekle
+          function clearDropdown(selector, placeholder){
+            $(selector).empty()
+                       .append(`<option value="">${placeholder}</option>`);
+          }
+
+          // Helper: Form reset
+          function resetForm(){
+            $('#addEmployeeForm')[0].reset();
+            $('#addEmployeeForm').removeClass('was-validated');
+            clearDropdown('#workplaceSelect', 'Çalışma Yeri Seçin...');
+            clearDropdown('#employee', 'Çalışan Seçin...');
+            $('#workplaceSelect, #employee').prop('disabled', true);
+          }
+        });
     </script>
 }

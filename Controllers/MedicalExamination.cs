@@ -21,5 +21,10 @@ namespace guvenport.Controllers
         {
             return View();
         }
+        [HttpGet("litelist")]
+        public IActionResult litelist()
+        {
+            return View();
+        }
     }
 }

@@ -1,0 +1,134 @@
+﻿@{
+    ViewData["Title"] = "Yeni Çalışma Yeri Ekle";
+}
+
+<link rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+
+<div class="container mt-5">
+    <div class="card mx-auto shadow" style="max-width: 700px;">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Yeni Çalışma Yeri Ekle</h4>
+        </div>
+        <div class="card-body">
+            <div id="alertBox" class="alert alert-danger d-none"></div>
+            <form id="workplaceForm">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="name">Ad</label>
+                        <input type="text" class="form-control" id="name" placeholder="Çalışma yeri adını girin" required />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="ssn">Sicil No</label>
+                        <input type="text" class="form-control" id="ssn" placeholder="SSN girin" required />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="adress">Adres</label>
+                        <input type="text" class="form-control" id="adress" placeholder="Adres bilgisi" required />
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="hazardLevel">Tehlike Düzeyi</label>
+                        <select id="hazardLevel" class="form-control">
+                            <option value="3">Düşük (3)</option>
+                            <option value="2">Orta (2)</option>
+                            <option value="1">Çok Tehlike (1)</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3 d-flex align-items-center">
+                        <div class="form-check mt-2">
+                            <input type="checkbox" class="form-check-input" id="active" checked />
+                            <label class="form-check-label" for="active">Aktif</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="officeSelect">Ofis Seçin</label>
+                    <select id="officeSelect" class="form-control" required>
+                        <option value="">Ofis Seçin...</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-block">
+                    <i class="fas fa-plus-circle"></i> Ekle
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- FontAwesome ikonu için (opsiyonel) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+
+<script>
+    $(function(){
+      var token   = Cookies.get('authToken') || '',
+          headers = { 'Authorization': 'Bearer ' + token };
+
+      // Ofisleri yükle
+      $.ajax({
+        url: 'https://localhost:44384/api/office/all',
+        type: 'GET',
+        headers: headers,
+        success: function(offices) {
+          var sel = $('#officeSelect').empty()
+                                     .append('<option value="">Ofis Seçin...</option>');
+          offices.forEach(function(o){
+            sel.append('<option value="' + o.id + '">' + o.officeName + '</option>');
+          });
+        },
+        error: function(xhr) {
+          $('#alertBox').removeClass('d-none')
+                        .text('Ofisler yüklenemedi: ' + xhr.statusText);
+        }
+      });
+
+      // Form submit
+      $('#workplaceForm').on('submit', function(e){
+        e.preventDefault();
+        $('#alertBox').addClass('d-none').text('');
+
+        var dto = {
+          name:                 $('#name').val().trim(),
+          socialSecurityNumber: $('#ssn').val().trim(),
+          adress:               $('#adress').val().trim(),
+          hazardLevel:          parseInt($('#hazardLevel').val(), 10),
+          active:               $('#active').is(':checked'),
+          idOffice:             parseInt($('#officeSelect').val(), 10)
+        };
+
+        // Basit validasyon
+        if (!dto.idOffice) {
+          $('#alertBox').removeClass('d-none')
+                        .text('Lütfen bir ofis seçin.');
+          return;
+        }
+
+        $.ajax({
+          url: 'https://localhost:44384/api/workplace/add',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(dto),
+          headers: headers,
+          success: function(resp) {
+            $('<div class="alert alert-success">Çalışma yeri başarıyla eklendi! (ID: '
+                + resp.id + ')</div>')
+              .insertBefore('#workplaceForm')
+              .delay(3000).fadeOut();
+            $('#workplaceForm')[0].reset();
+          },
+          error: function(xhr) {
+            var msg = xhr.responseJSON && xhr.responseJSON.errors
+                      ? xhr.responseJSON.errors.join(', ')
+                      : xhr.responseText || xhr.statusText;
+            $('#alertBox').removeClass('d-none').text(msg);
+          }
+        });
+      });
+    });
+</script>

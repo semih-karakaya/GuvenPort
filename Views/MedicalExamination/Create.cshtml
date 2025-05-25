@@ -1,190 +1,194 @@
-﻿<div class="container mt-5">
-    <h2 class="text-center mb-4">Tıbbi Muayene Ekle</h2>
+﻿
 
-    <form id="medicalExaminationForm">
-        <div class="form-group">
-            <label for="examinationDate">Muayene Tarihi</label>
-            <input type="date" id="examinationDate" class="form-control" required />
+@{
+    ViewData["Title"] = "Tıbbi Muayene Ekle";
+}
+
+<!-- Eğer Layout’ınızda yoksa ekleyin -->
+<link rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">Tıbbi Muayene Ekle</h4>
         </div>
+        <div class="card-body">
+            <form id="medicalExaminationForm">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="examinationDate">Muayene Tarihi<span class="text-danger">*</span></label>
+                        <input type="date" id="examinationDate"
+                               class="form-control" required />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="validityDate">Geçerlilik Tarihi<span class="text-danger">*</span></label>
+                        <input type="date" id="validityDate"
+                               class="form-control" required />
+                    </div>
+                </div>
 
-        <div class="form-group">
-            <label for="validityDate">Geçerlilik Tarihi</label>
-            <input type="date" id="validityDate" class="form-control" required />
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="doctorSelect">Doktor<span class="text-danger">*</span></label>
+                        <select id="doctorSelect"
+                                class="form-control"
+                                required>
+                            <option value="">Doktor Seçin...</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="employeeSelect">Çalışan<span class="text-danger">*</span></label>
+                        <select id="employeeSelect"
+                                class="form-control"
+                                required>
+                            <option value="">Çalışan Seçin...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="exFileLocation">Dosya Yeri</label>
+                    <input type="text" id="exFileLocation"
+                           class="form-control"
+                           placeholder="Örn: /files/rapor.pdf" />
+                </div>
+
+                <div class="form-row align-items-center">
+                    <div class="form-group col-md-6">
+                        <label for="examinationType">Muayene Tipi<span class="text-danger">*</span></label>
+                        <select id="examinationType"
+                                class="form-control"
+                                required>
+                            <option value="">Tip Seçin…</option>
+                            <option value="1">Giriş</option>
+                            <option value="2">Periyodik</option>
+                            <option value="3">Kaza Sonrası</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6 d-flex">
+                        <div class="custom-control custom-switch mr-4">
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   id="exFilePrinted">
+                            <label class="custom-control-label"
+                                   for="exFilePrinted">
+                                Dosya Basıldı
+                            </label>
+                        </div>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   id="exIbys">
+                            <label class="custom-control-label"
+                                   for="exIbys">
+                                İBYs
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-success btn-block">
+                    Kaydet
+                </button>
+            </form>
         </div>
-
-        <div class="form-group">
-            <label for="doctorSelect">Doktor Seçin</label>
-            <select id="doctorSelect" class="form-control" required>
-                <option value="">Doktor Seçin...</option>
-                <!-- Doktorlar buraya dinamik olarak yüklenecek -->
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="employeeSelect">Çalışan Seçin</label>
-            <select id="employeeSelect" class="form-control" required>
-                <option value="">Çalışan Seçin...</option>
-                <!-- Çalışanlar buraya dinamik olarak yüklenecek -->
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="exFileLocation">Dosya Yeri</label>
-            <input type="text" id="exFileLocation" class="form-control" />
-        </div>
-
-        <div class="form-group">
-            <label for="examinationType">Muayene Tipi</label>
-            <select id="examinationType" class="form-control" required>
-                <option value="">Muayene Tipini Seçin...</option>
-                <option value="1">Giriş</option>
-                <option value="2">Periyodik</option>
-                <option value="3">Kaza Sonrası</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="exFilePrinted">Dosya Basıldı</label>
-            <input type="checkbox" id="exFilePrinted" class="form-check-input" />
-        </div>
-
-        <div class="form-group">
-            <label for="exIbys">İBYs</label>
-            <input type="checkbox" id="exIbys" class="form-check-input" />
-        </div>
-
-        <button type="submit" class="btn btn-primary">Kaydet</button>
-    </form>
+    </div>
 </div>
 
 @section Scripts {
+    <!-- jQuery + Bootstrap + js-cookie -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+
     <script>
-        $(document).ready(function () {
-            const token = Cookies.get('authToken');
-            loadDoctors(); // Doktorları yükle
-            loadEmployees(); // Çalışanları yükle
+        $(function(){
+          const token   = Cookies.get('authToken') || '';
+          const headers = {
+            'Authorization': 'Bearer ' + token,
+            'Accept': 'text/plain'
+          };
 
-            $('#medicalExaminationForm').on('submit', function (e) {
-                e.preventDefault();
-                submitMedicalExaminationForm();
-            });
-        });
+          // 1. Sayfa açılınca doktor ve çalışan listelerini yükle
+          loadDoctors();
+          loadEmployees();
 
-        function loadDoctors() {
-            const token = Cookies.get('authToken');
+          function loadDoctors(){
             $.ajax({
-                url: 'https://localhost:44384/api/doctors/all', // Doktorları çekmek için gidecek URL
-                type: 'GET',
-                headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
-                success: function (data) {
-                    populateDoctors(data);
-                },
-                error: function () {
-                    console.error("Doktorlar yüklenirken bir hata oluştu.");
-                }
+              url: 'https://localhost:44384/api/doctors/all',
+              type: 'GET',
+              headers,
+              success: populateDoctors,
+              error: function(){
+                console.error('Doktorlar yüklenemedi.');
+              }
             });
-        }
-
-        function populateDoctors(doctors) {
-            $('#doctorSelect').empty().append('<option value="">Doktor Seçin...</option>');
-            $.each(doctors, function (i, doctor) {
-                $('#doctorSelect').append(`<option value="${doctor.id}">${doctor.name}</option>`);
+          }
+          function populateDoctors(list){
+            const $sel = $('#doctorSelect').empty()
+                           .append('<option value="">Doktor Seçin…</option>');
+            list.forEach(d => {
+              $sel.append(`<option value="${d.id}">${d.name}</option>`);
             });
-        }
+          }
 
-        function loadEmployees() {
-            const token = Cookies.get('authToken');
+          function loadEmployees(){
             $.ajax({
-                url: 'https://localhost:44384/api/employees/all', // Çalışanları çekmek için gidecek URL
-                type: 'GET',
-                headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
-                success: function (data) {
-                    populateEmployees(data);
-                },
-                error: function () {
-                    console.error("Çalışanlar yüklenirken bir hata oluştu.");
-                }
+              url: 'https://localhost:44384/api/employees/all',
+              type: 'GET',
+              headers,
+              success: populateEmployees,
+              error: function(){
+                console.error('Çalışanlar yüklenemedi.');
+              }
             });
-        }
-
-        function populateEmployees(employees) {
-            $('#employeeSelect').empty().append('<option value="">Çalışan Seçin...</option>');
-            $.each(employees, function (i, employee) {
-                $('#employeeSelect').append(`<option value="${employee.id}">${employee.name}</option>`);
+          }
+          function populateEmployees(list){
+            const $sel = $('#employeeSelect').empty()
+                           .append('<option value="">Çalışan Seçin…</option>');
+            list.forEach(e => {
+              $sel.append(`<option value="${e.id}">${e.name}</option>`);
             });
-        }
+          }
 
-        function submitMedicalExaminationForm() {
-            const token = Cookies.get('authToken');
-            const medicalExaminationData = {
-                id: 0,  // Yeni bir kayıt için genellikle 0 kullanırız
-                date: $('#examinationDate').val(),
-                isDisabled: false, // Varsayılan değeri ayarlayın
-                validityDate: $('#validityDate').val(),
-                idContract: 0, // Eğer kontrat kullanmıyorsanız 0 kalabilir
-                idDoctor: parseInt($('#doctorSelect').val()) || 0, // Seçim yapılmadıysa 0
-                exFilePrinted: $('#exFilePrinted').is(':checked'),
-                exIbys: $('#exIbys').is(':checked'),
-                exFileLocation: $('#exFileLocation').val() || "string", // Varsayılan bir değer
-                exFilePrintedUploaded: false, // Varsayılan değeri ayarlayın
-                examination_type: parseInt($('#examinationType').val()) || 0 // Seçim yapılmadıysa 0
+          // 2. Form gönderildiğinde
+          $('#medicalExaminationForm').on('submit', function(e){
+            e.preventDefault();
+            const data = {
+              id: 0,
+              date: $('#examinationDate').val(),
+              validityDate: $('#validityDate').val(),
+              idContract: 0,
+              idDoctor: parseInt($('#doctorSelect').val()) || 0,
+              exFileLocation: $('#exFileLocation').val() || '',
+              exFilePrinted: $('#exFilePrinted').is(':checked'),
+              exIbys: $('#exIbys').is(':checked'),
+              exFilePrintedUploaded: false,
+              examination_type: parseInt($('#examinationType').val()) || 0,
+              isDisabled: false
             };
 
-            console.log("Gönderilecek veri:", JSON.stringify(medicalExaminationData)); // Veriyi konsola yazdır
+            console.log('Gönderilen:', data);
 
             fetch('https://localhost:44384/api/medicalexamination/AddMedicalExamination', {
-                method: 'POST',   
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Accept': 'text/plain',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(medicalExaminationData)
+              method: 'POST',
+              headers: Object.assign({
+                'Content-Type': 'application/json'
+              }, headers),
+              body: JSON.stringify(data)
             })
-            .then(response => {
-                if (response.ok) {
-                    alert('Tıbbi muayene başarıyla kaydedildi!');
-                    $('#medicalExaminationForm')[0].reset(); // Formu sıfırla
-                } else {
-                    return response.json().then(err => {
-                        throw new Error(err.message || 'Kayıt sırasında hata oluştu.');
-                    });
-                }
+            .then(res => {
+              if (!res.ok) return res.text().then(txt => Promise.reject(txt));
+              alert('Tıbbi muayene başarıyla kaydedildi!');
+              $('#medicalExaminationForm')[0].reset();
             })
-            .catch(error => {
-                console.error('Error:', error);
-                alert(error.message);
+            .catch(err => {
+              console.error(err);
+              alert('Kayıt işlemi sırasında bir hata oluştu:\n' + err);
             });
-            $.ajax({
-                url: 'https://localhost:44384/api/medicalexamination/AddMedicalExamination',
-                type: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Accept': 'text/plain',
-                    'Content-Type': 'application/json'
-                },
-                data: JSON.stringify(medicalExaminationData),
-                success: function () {
-                    alert('Tıbbi muayene başarıyla kaydedildi!');
-                    $('#medicalExaminationForm')[0].reset();
-                },
-                error: function (xhr) {
-                    let errorMsg = 'Kayıt sırasında hata oluştu.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMsg = xhr.responseJSON.message;
-                    }
-                    console.error('Error:', errorMsg);
-                    alert(errorMsg);
-                }
-            });
-        }
+          });
+        });
     </script>
 }

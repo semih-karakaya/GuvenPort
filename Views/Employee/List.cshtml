@@ -4,9 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Çalışan Listesi</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <!-- 1) CSS: Bootstrap, DataTables ve Buttons -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" />
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap4.min.css" />
 </head>
 <body>
     <div class="container mt-4">
@@ -26,56 +31,136 @@
                     <th>İşlemler</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- AJAX ile veri yüklenecek -->
-            </tbody>
+            <tbody></tbody>
         </table>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js" defer></script>
+    <!-- 2) JS: jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- 3) JS: Bootstrap Bundle (Popper + Bootstrap JS) -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <!-- 4) JS: DataTables çekirdek + Bootstrap4 entegrasyonu -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- 5) JS: Buttons extension ve bağımlılıkları -->
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.colVis.min.js"></script>
+    <!-- 6) JS: js-cookie -->
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <!-- 7) JS: FontAwesome (ikonlar için) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 
-
+    <!-- 8) Kendi DataTable başlatma kodunuz -->
     <script>
         $(document).ready(function () {
-            const token = Cookies.get('authToken');
+          var token = Cookies.get('authToken') || '';
+          var headers = { 'Authorization': 'Bearer ' + token };
 
-            // DataTable'ı önce başlatıyoruz
-            var table = $('#employeeTable').DataTable();
-            $.noConflict();
-            $.ajax({
-                url: "https://localhost:44384/api/employees/list", // API endpoint
-                method: "GET",
-                headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
+          $('#employeeTable').DataTable({
+            ajax: {
+              url: 'https://localhost:44384/api/employees/list',
+              type: 'GET',
+              headers: headers,
+              dataSrc: ''  // JSON dizi şeklinde dönüyor
             },
-                success: function(data) {
-                    var rows = [];
-                    data.forEach(function(employee) {
-                        rows.push([
-                            employee.name,
-                            employee.ssn,
-                            employee.sex,
-                            employee.bloodT,
-                            employee.dob.substring(0, 10),
-                            employee.disable ? "Evet" : "Hayır",
-                            employee.active ? "Evet" : "Hayır",
-                            employee.entryDate.substring(0, 10),
-                            employee.chronic ? "Evet" : "Hayır",
-                            `<a class="btn btn-warning btn-sm" href="/employee/update/${employee.id}">Güncelle</a>
-                            <a class="btn btn-danger btn-sm" href="/employee/delete/${employee.id}" onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?');">Sil</a>`
-                        ]);
-                    });
-                    table.clear();
-                    table.rows.add(rows).draw();
-                },
-                error: function(xhr, status, error) {
-                    console.error("Bir hata oluştu: " + error);
+            dom: "<'row mb-2'<'col-sm-6'B><'col-sm-6'f>>" +
+                 "<'row'<'col-sm-12'tr>>" +
+                 "<'row mt-2'<'col-sm-5'i><'col-sm-7'p>>",
+            buttons: [
+              {
+                extend: 'excelHtml5',
+                text: '<i class="fas fa-file-excel"></i> Excel',
+                className: 'btn btn-sm btn-success',
+                exportOptions: { columns: ':not(:last-child)' }
+              },
+              {
+                extend: 'pdfHtml5',
+                text: '<i class="fas fa-file-pdf"></i> PDF',
+                className: 'btn btn-sm btn-danger',
+                exportOptions: { columns: ':not(:last-child)' }
+              },
+              {
+                extend: 'print',
+                text: '<i class="fas fa-print"></i> Yazdır',
+                className: 'btn btn-sm btn-secondary',
+                exportOptions: { columns: ':not(:last-child)' }
+              },
+              {
+                extend: 'colvis',
+                text: '<i class="fas fa-columns"></i> Sütunlar',
+                className: 'btn btn-sm btn-info'
+              }
+            ],
+            columns: [
+              { data: 'name' },
+              { data: 'ssn' },
+              { data: 'sex' },
+              { data: 'bloodT' },
+              {
+                data: 'dob',
+                render: function (d) { return d ? d.substr(0,10) : ''; }
+              },
+              {
+                data: 'disable',
+                render: function (v) { return v ? 'Evet' : 'Hayır'; }
+              },
+              {
+                data: 'active',
+                render: function (v) { return v ? 'Evet' : 'Hayır'; }
+              },
+              {
+                data: 'entryDate',
+                render: function (d) { return d ? d.substr(0,10) : ''; }
+              },
+              {
+                data: 'chronic',
+                render: function (v) { return v ? 'Evet' : 'Hayır'; }
+              },
+              {
+                data: 'id',
+                orderable: false,
+                searchable: false,
+                width: '140px',
+                render: function (id) {
+                  return  '<a class="btn btn-sm btn-warning mr-1" ' +
+                          'href="/employee/update/' + id + '">' +
+                          '<i class="fas fa-edit"></i></a>' +
+                          '<button class="btn btn-sm btn-danger btn-delete" ' +
+                          'data-id="' + id + '">' +
+                          '<i class="fas fa-trash"></i></button>';
                 }
+              }
+            ],
+            language: {
+              url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/tr.json'
+            },
+            responsive: true,
+            lengthChange: false
+          });
+
+          // Sil butonu handler
+          $('#employeeTable').on('click', '.btn-delete', function () {
+            var id = $(this).data('id');
+            if (!confirm('Bu kaydı silmek istediğinize emin misiniz?')) return;
+
+            $.ajax({
+              url: 'https://localhost:44384/api/employees/delete/' + id,
+              type: 'DELETE',
+              headers: headers,
+              success: function () {
+                $('#employeeTable').DataTable().ajax.reload(null, false);
+              },
+              error: function (xhr) {
+                alert('Silme hatası: ' + xhr.responseText);
+              }
             });
+          });
         });
     </script>
 </body>

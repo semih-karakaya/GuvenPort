@@ -1,118 +1,195 @@
-﻿<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Çalışan Ekle</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-    <div class="container">
-        <h1 class="my-4">Çalışan Ekle</h1>
-        <form id="employeeForm">
-            <div class="form-group">
-                <label for="name">İsim:</label>
-                <input type="text" class="form-control" id="name" required>
-            </div>
+﻿@{
+    ViewData["Title"] = "Yeni Çalışan Ekle";
+}
 
-            <div class="form-group">
-                <label for="ssn">SSN:</label>
-                <input type="text" class="form-control" id="ssn" required maxlength="11">
-                <small class="form-text text-muted">SSN 11 karakter uzunluğunda olmalıdır.</small>
-            </div>
+<!-- Bootstrap CSS -->
+<link rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
 
-            <div class="form-group">
-                <label for="sex">Cinsiyet:</label>
-                <select class="form-control" id="sex" required>
-                    <option value="" disabled selected>Cinsiyeti Seçin</option>
-                    <option value="Erkek">Erkek</option>
-                    <option value="Kadın">Kadın</option>
-                </select>
-            </div>
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Yeni Çalışan Ekle</h4>
+        </div>
+        <div class="card-body">
+            <!-- Hata / Başarı mesajı -->
+            <div id="alertBox" class="alert d-none" role="alert"></div>
 
-            <div class="form-group">
-                <label for="bloodT">Kan Grubu:</label>
-                <select class="form-control" id="bloodT" required>
-                    <option value="" disabled selected>Kan Gruplarını Seçin</option>
-                    <option value="A+">A+</option>
-                    <option value="A-">A-</option>
-                    <option value="B+">B+</option>
-                    <option value="B-">B-</option>
-                    <option value="AB+">AB+</option>
-                    <option value="AB-">AB-</option>
-                    <option value="0+">0+</option>
-                    <option value="0-">0-</option>
-                </select>
-            </div>
+            <form id="employeeForm" novalidate>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="name">İsim <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name"
+                               placeholder="Adınızı girin" required>
+                        <div class="invalid-feedback">
+                            Lütfen isim alanını doldurun.
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="ssn">SSN <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="ssn"
+                               placeholder="11 haneli kimlik no" maxlength="11" required>
+                        <small class="form-text text-muted">
+                            SSN 11 karakter uzunluğunda olmalıdır.
+                        </small>
+                        <div class="invalid-feedback">
+                            Lütfen geçerli bir SSN girin.
+                        </div>
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label for="dob">Doğum Tarihi:</label>
-                <input type="date" class="form-control" id="dob" required>
-            </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="sex">Cinsiyet <span class="text-danger">*</span></label>
+                        <select class="form-control" id="sex" required>
+                            <option value="">Seçin…</option>
+                            <option value="Erkek">Erkek</option>
+                            <option value="Kadın">Kadın</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Lütfen cinsiyet seçin.
+                        </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="bloodT">Kan Grubu <span class="text-danger">*</span></label>
+                        <select class="form-control" id="bloodT" required>
+                            <option value="">Seçin…</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="0+">0+</option>
+                            <option value="0-">0-</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Lütfen kan grubunu seçin.
+                        </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="dob">Doğum Tarihi <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="dob" required>
+                        <div class="invalid-feedback">
+                            Lütfen doğum tarihinizi girin.
+                        </div>
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label for="disable">Engelli:</label>
-                <input type="checkbox" id="disable">
-            </div>
+                <div class="form-row align-items-center">
+                    <div class="form-group col-md-3">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   id="disable">
+                            <label class="custom-control-label"
+                                   for="disable">Engelli</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   id="active" checked>
+                            <label class="custom-control-label"
+                                   for="active">Aktif</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="entryDate">Giriş Tarihi <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="entryDate" required>
+                        <div class="invalid-feedback">
+                            Lütfen giriş tarihini girin.
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <div class="custom-control custom-switch mt-4">
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   id="chronic">
+                            <label class="custom-control-label"
+                                   for="chronic">Kronik Hastalık</label>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label for="active">Aktif:</label>
-                <input type="checkbox" id="active" checked>
-            </div>
-
-            <div class="form-group">
-                <label for="entryDate">Giriş Tarihi:</label>
-                <input type="date" class="form-control" id="entryDate" required>
-            </div>
-
-            <div class="form-group">
-                <label for="chronic">Kronik Hastalık:</label>
-                <input type="checkbox" id="chronic">
-            </div>
-
-            <button type="submit" class="btn btn-primary">Ekle</button>
-        </form>
+                <button type="submit"
+                        class="btn btn-success btn-block">
+                    Çalışan Ekle
+                </button>
+            </form>
+        </div>
     </div>
+</div>
+
+@section Scripts {
+    <!-- jQuery, Bootstrap JS, js-cookie, FontAwesome -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+
     <script>
-        $(document).ready(function() {
-            const token = Cookies.get('authToken');
-            $('#employeeForm').on('submit', function(event) {
-                event.preventDefault(); // Formun varsayılan davranışını engeller
+        $(function(){
+          const token   = Cookies.get('authToken');
+          const headers = {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'text/plain'
+          };
 
-                const employeeData = {
-                    id: 0,
-                    name: $('#name').val(),
-                    ssn: $('#ssn').val(),
-                    sex: $('#sex').val(), // Dropdown'dan seçilen cinsiyeti alıyoruz
-                    bloodT: $('#bloodT').val(), // Dropdown'dan seçilen kan grubunu alıyoruz
-                    dob: $('#dob').val(),
-                    disable: $('#disable').is(':checked'),
-                    active: $('#active').is(':checked'),
-                    entryDate: $('#entryDate').val(),
-                    chronic: $('#chronic').is(':checked')
-                };
+          // Form validasyon
+          const form = $('#employeeForm')[0];
+          $('#employeeForm').on('submit', function(e){
+            e.preventDefault();
+            e.stopPropagation();
 
-                $.ajax({
-                    url: 'https://localhost:44384/api/employees/add',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(employeeData),
-                    headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
-                    success: function(response) {
-                        alert('Çalışan başarıyla eklendi!');
-                        $('#employeeForm')[0].reset(); // Formu sıfırlar
-                    },
-                    error: function(xhr, status, error) {
-                        alert('Bir hata oluştu: ' + error);
-                    }
-                });
+            if (!form.checkValidity()) {
+              $(form).addClass('was-validated');
+              return;
+            }
+
+            // Payload
+            const employeeData = {
+              id: 0,
+              name:        $('#name').val().trim(),
+              ssn:         $('#ssn').val().trim(),
+              sex:         $('#sex').val(),
+              bloodT:      $('#bloodT').val(),
+              dob:         $('#dob').val(),
+              disable:     $('#disable').is(':checked'),
+              active:      $('#active').is(':checked'),
+              entryDate:   $('#entryDate').val(),
+              chronic:     $('#chronic').is(':checked')
+            };
+
+            // AJAX POST
+            $.ajax({
+              url: 'https://localhost:44384/api/employees/add',
+              method: 'POST',
+              contentType: 'application/json',
+              headers: headers,
+              data: JSON.stringify(employeeData),
+              success: function(){
+                showAlert('Çalışan başarıyla eklendi!', 'success');
+                form.reset();
+                $(form).removeClass('was-validated');
+              },
+              error: function(xhr){
+                const msg = xhr.responseText || xhr.statusText;
+                showAlert('Hata: ' + msg, 'danger');
+              }
             });
+          });
+
+          // Alert helper
+          function showAlert(message, type){
+            const $box = $('#alertBox');
+            $box.removeClass('d-none alert-success alert-danger')
+                .addClass('alert-' + type)
+                .text(message);
+            // 3 saniye sonra gizle
+            setTimeout(()=> $box.addClass('d-none'), 3000);
+          }
         });
     </script>
-</body>
-</html>
+}

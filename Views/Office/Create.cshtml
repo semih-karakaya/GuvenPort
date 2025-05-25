@@ -1,0 +1,167 @@
+﻿@{
+    ViewData["Title"] = "Yeni Ofis Ekle";
+}
+<link rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Yeni Ofis Ekle</h4>
+        </div>
+        <div class="card-body">
+
+            <!-- Uyarı/Kayıt Hata Kutusu -->
+            <div id="alertBox" class="alert alert-danger d-none" role="alert"></div>
+
+            <form id="officeForm" novalidate>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="address">Adres <span class="text-danger">*</span></label>
+                        <input type="text"
+                               class="form-control"
+                               id="address"
+                               placeholder="Adres girin"
+                               required />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="oname">Ofis Adı <span class="text-danger">*</span></label>
+                        <input type="text"
+                               class="form-control"
+                               id="oname"
+                               placeholder="Ofis adını girin"
+                               required />
+                    </div>
+                </div>
+
+                <div class="form-row align-items-end">
+                    <div class="form-group col-md-4">
+                        <label for="crm">CRM Kodu</label>
+                        <input type="text"
+                               class="form-control"
+                               id="crm"
+                               placeholder="Opsiyonel" />
+                    </div>
+                    <div class="form-group col-md-2">
+                        <div class="custom-control custom-switch mt-2">
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   id="active">
+                            <label class="custom-control-label"
+                                   for="active">Aktif</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="managerSelect">Yönetici Personel <span class="text-danger">*</span></label>
+                        <select id="managerSelect"
+                                class="form-control"
+                                required>
+                            <option value="">Seçiniz...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-success btn-block">
+                    <i class="fas fa-plus-circle"></i> Kaydet
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <script>
+        // Helper: Auth token al
+        function getAuthToken(){
+          return Cookies.get('authToken') || '';
+        }
+
+        $(function(){
+          const token   = getAuthToken();
+          const headers = { 'Authorization': 'Bearer ' + token };
+
+          // Sayfa açılınca manager listesini doldur
+          loadManagers();
+
+          function loadManagers(){
+            $.ajax({
+              url: 'https://localhost:44384/api/staff/ListStaff',
+              type: 'GET',
+              headers: headers,
+              success: function(list){
+                const managers = list.filter(u => u.doctor === null);
+                const $sel = $('#managerSelect')
+                              .empty()
+                              .append('<option value="">Seçiniz...</option>');
+                managers.forEach(u => {
+                  $sel.append(
+                    `<option value="${u.id}">${u.name}</option>`
+                  );
+                });
+              },
+              error: function(xhr){
+                $('#alertBox')
+                  .removeClass('d-none')
+                  .text('Yönetici listesi yüklenemedi: ' + xhr.statusText);
+              }
+            });
+          }
+
+          // Form submit handler
+          $('#officeForm').on('submit', function(e){
+            e.preventDefault();
+            $('#alertBox').addClass('d-none').text('');
+
+            // Basit client-side validasyon
+            if (!this.checkValidity()) {
+              $(this).addClass('was-validated');
+              return;
+            }
+
+            const dto = {
+              Address:        $('#address').val().trim(),
+              OName:          $('#oname').val().trim(),
+              Crm:            $('#crm').val().trim() || null,
+              Active:         $('#active').is(':checked'),
+              IdManagerstaff: parseInt($('#managerSelect').val()) || null
+            };
+
+            $.ajax({
+              url: 'https://localhost:44384/api/offices/add',
+              type: 'POST',
+              contentType: 'application/json',
+              headers: headers,
+              data: JSON.stringify(dto),
+              success: function(resp){
+                if (resp && resp.success) {
+                  alert('Ofis başarıyla eklendi (ID: ' + resp.id + ')');
+                  $('#officeForm')[0].reset();
+                  $('#officeForm').removeClass('was-validated');
+                }
+                else {
+                  $('#alertBox')
+                    .removeClass('d-none')
+                    .text('Sunucudan beklenmeyen yanıt alındı.');
+                }
+              },
+              error: function(xhr){
+                let msg = '';
+                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                  msg = xhr.responseJSON.errors.join(', ');
+                }
+                else {
+                  msg = xhr.responseText || xhr.statusText;
+                }
+                $('#alertBox')
+                  .removeClass('d-none')
+                  .text(msg);
+              }
+            });
+          });
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+}

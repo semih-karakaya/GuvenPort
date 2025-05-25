@@ -15,4 +15,15 @@
     public interface IMedicalExaminationService
     {
     }
+    public interface IContractService
+    {
+    }
+    public interface IWorkplaceService
+    {
+    }
+    public interface IOfficeService
+    {
+        Task<List<OfficeDto>> ListOfficesAsync();
+       
+    }
 }

@@ -3,14 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace guvenport.Controllers
 {
-    [Route("Workplace")]
-    public class WorkplaceController : Controller
+    [Route("Office")]
+    public class OfficeController : Controller
     {
-        private readonly IWorkplaceService _WorkplaceService;
+        private readonly IOfficeService _officeService;
 
-        public WorkplaceController(IWorkplaceService WorkplaceService)
+        public OfficeController(IOfficeService officeService)
         {
-            _WorkplaceService = WorkplaceService;
+            _officeService = officeService;
         }
 
         [HttpGet("create")]

@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <title>Muayene Lite Liste</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap CSS (isteğe bağlı) -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="mb-4">Muayene Lite Liste</h2>
+        <table id="liteListTable"
+               class="display table table-striped table-bordered"
+               style="width:100%">
+            <thead>
+                <tr>
+                    <th>Muayene Tarihi</th>
+                    <th>Doktor</th>
+                    <th>Çalışan</th>
+                    <th>Muayene Tipi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- AJAX ile dolacak -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+
+    <script>
+        $(function(){
+          // Eğer Authorization gerekiyor ise:
+          const token   = Cookies.get('authToken') || '';
+          const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+
+          $('#liteListTable').DataTable({
+            processing: true,
+            serverSide: false,
+            pageLength: 10,
+            lengthMenu: [10, 25, 50],
+            ajax: {
+              url: 'https://localhost:44384/api/staffexaminationsummary/list',
+              type: 'GET',
+              headers: headers,
+              dataSrc: ''   // API doğrudan dizi döndürüyor
+            },
+            columns: [
+              {
+                data: 'examinationDate',
+                title: 'Muayene Tarihi',
+                render: function(d) {
+                  if (!d) return '';
+                  // d formatı "YYYY-MM-DD"
+                  const dt = new Date(d);
+                  return dt.toLocaleDateString('tr-TR');
+                }
+              },
+              { data: 'doctorName', title: 'Doktor' },
+              { data: 'employeeName', title: 'Çalışan' },
+              {
+                data: 'examinationType',
+                title: 'Muayene Tipi',
+                render: function(val) {
+                  switch(val) {
+                    case 1: return 'Giriş';
+                      case 2: return 'Periyodik';
+                      case 3: return 'Kaza Sonrası';
+                      default: return 'Belirtilmemiş';
+                  }
+                }
+              }
+            ],
+            order: [[0,'desc']],
+            language: {
+              url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json'
+            }
+          });
+        });
+    </script>
+</body>
+</html>
