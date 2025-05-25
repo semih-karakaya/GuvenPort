@@ -124,6 +124,7 @@
         });
 
         function loadOffices() {
+            const token = Cookies.get('authToken');
             $.ajax({
                 url: 'https://localhost:44384/api/office/all',
                 type: 'GET',
@@ -149,6 +150,7 @@
         }
 
         function loadWorkplaces(officeId) {
+            const token = Cookies.get('authToken');
             $.ajax({
                 url: `https://localhost:44384/api/office/${officeId}/active-workplaces`,
                 type: 'GET',
@@ -173,6 +175,7 @@
         }
 
         function loadStaffByWorkplace(workplaceId) {
+            const token = Cookies.get('authToken');
             $.ajax({
                 url: 'https://localhost:44384/api/staff/ListStaff',
                 type: 'GET',
@@ -199,6 +202,7 @@
         }
 
         function loadContractsByWorkplace(workplaceId) {
+            const token = Cookies.get('authToken');
             $.ajax({
                 url: `https://localhost:44384/api/contracts/byworkplace/${workplaceId}/employees`,
                 type: 'GET',
@@ -285,12 +289,12 @@
                 selectedContractIds: selectedContracts 
             };
 
-            console.log("Gönderilecek veri:", JSON.stringify(accidentData)); 
-
+            console.log("Gönderilecek veri:", JSON.stringify(accidentData));
+            const token = Cookies.get('authToken');
             fetch('https://localhost:44384/api/accident', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'text/plain'
                 }, 
