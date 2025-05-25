@@ -74,9 +74,10 @@
             <button type="submit" class="btn btn-primary">Ekle</button>
         </form>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
     <script>
         $(document).ready(function() {
+            const token = Cookies.get('authToken');
             $('#employeeForm').on('submit', function(event) {
                 event.preventDefault(); // Formun varsayılan davranışını engeller
 
@@ -98,6 +99,10 @@
                     method: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(employeeData),
+                    headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
                     success: function(response) {
                         alert('Çalışan başarıyla eklendi!');
                         $('#employeeForm')[0].reset(); // Formu sıfırlar

@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -7,16 +8,27 @@ using System.Threading.Tasks;
 public class AuthenticationService
 {
     private readonly HttpClient _httpClient;
+    private readonly IHttpContextAccessor _contextAccessor;
 
-    public AuthenticationService(HttpClient httpClient)
+    public AuthenticationService(HttpClient httpClient, IHttpContextAccessor contextAccessor)
     {
-        _httpClient = httpClient;
+        _contextAccessor = contextAccessor;
+        var httphelpernew = new httpHelpers();
+        _httpClient = httphelpernew.HttpHelper(httpClient, contextAccessor);
     }
 
     public async Task<LoginResult?> LoginAsync(string Mail, string Password)
     {
-        var requestBody = new { Mail, Password };
-        var response = await _httpClient.PostAsJsonAsync("api/auth/login", requestBody);
+        var requestData = new { Mail = Mail, Password = Password };
+        var jsonContent = new StringContent(
+           JsonSerializer.Serialize(requestData),
+           Encoding.UTF8,
+           "application/json"
+       );
+
+        // Send the HTTP POST request
+        var response = await _httpClient.PostAsync("api/auth/login", jsonContent);
+
         if (!response.IsSuccessStatusCode)
             return null;
 
@@ -41,7 +53,6 @@ public class AuthenticationService
         [JsonPropertyName("isDoctor")]
         public bool IsDoctor { get; set; }
         [JsonPropertyName("name")]
-
         public string? Name { get; set; }
     }
 }

@@ -59,8 +59,10 @@
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
     <script>
         $(document).ready(function () {
+            const token = Cookies.get('authToken');
             loadDoctors(); // Doktorları yükle
             loadEmployees(); // Çalışanları yükle
 
@@ -71,9 +73,14 @@
         });
 
         function loadDoctors() {
+            const token = Cookies.get('authToken');
             $.ajax({
                 url: 'https://localhost:44384/api/doctors/all', // Doktorları çekmek için gidecek URL
                 type: 'GET',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
                 success: function (data) {
                     populateDoctors(data);
                 },
@@ -91,9 +98,14 @@
         }
 
         function loadEmployees() {
+            const token = Cookies.get('authToken');
             $.ajax({
                 url: 'https://localhost:44384/api/employees/all', // Çalışanları çekmek için gidecek URL
                 type: 'GET',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
                 success: function (data) {
                     populateEmployees(data);
                 },
@@ -111,6 +123,7 @@
         }
 
         function submitMedicalExaminationForm() {
+            const token = Cookies.get('authToken');
             const medicalExaminationData = {
                 id: 0,  // Yeni bir kayıt için genellikle 0 kullanırız
                 date: $('#examinationDate').val(),
@@ -128,8 +141,10 @@
             console.log("Gönderilecek veri:", JSON.stringify(medicalExaminationData)); // Veriyi konsola yazdır
 
             fetch('https://localhost:44384/api/medicalexamination/AddMedicalExamination', {
-                method: 'POST',
+                method: 'POST',   
                 headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'text/plain',
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(medicalExaminationData)
@@ -147,6 +162,28 @@
             .catch(error => {
                 console.error('Error:', error);
                 alert(error.message);
+            });
+            $.ajax({
+                url: 'https://localhost:44384/api/medicalexamination/AddMedicalExamination',
+                type: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'text/plain',
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify(medicalExaminationData),
+                success: function () {
+                    alert('Tıbbi muayene başarıyla kaydedildi!');
+                    $('#medicalExaminationForm')[0].reset();
+                },
+                error: function (xhr) {
+                    let errorMsg = 'Kayıt sırasında hata oluştu.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    console.error('Error:', errorMsg);
+                    alert(errorMsg);
+                }
             });
         }
     </script>

@@ -20,13 +20,14 @@ public class LoginController : Controller
     public async Task<IActionResult> Index(string Mail, string Password)
     {
         var loginResult = await _authService.LoginAsync(Mail, Password);
-        if (loginResult != null && !string.IsNullOrEmpty(loginResult.Token))
+        if (loginResult != null)
         {
-            Response.Cookies.Append("jwt_token", loginResult.Token, new CookieOptions
+            Response.Cookies.Append("authToken", loginResult.Token, new CookieOptions
             {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict
+                HttpOnly = false,
+                Secure = true, // HTTPS üzerinde çalışmalıdır
+                SameSite = SameSiteMode.None,
+                Expires = DateTimeOffset.UtcNow.AddHours(1) // Token'ın süresi
             });
 
             // Kullanıcı adını cookie'ye ekle

@@ -61,13 +61,12 @@
                 <div class="modal-body">
                     <button class="btn btn-warning btn-block my-2" onclick="location.href='/accident/create'">Kaza Ekle</button>
                     <button class="btn btn-warning btn-block my-2" onclick="location.href='/accident/list'">Kaza Listele</button>
-                    <button class="btn btn-warning btn-block my-2" onclick="location.href='/MuayeneEkle'">Muayene Ekle</button>
-                    <button class="btn btn-warning btn-block my-2" onclick="location.href='/MuayeneListele'">Muayene Listele</button>
+                    <button class="btn btn-warning btn-block my-2" onclick="location.href='/medex/create'">Muayene Ekle</button>
+                    <button class="btn btn-warning btn-block my-2" onclick="location.href='/medex/list'">Muayene Listele</button>
                     <button class="btn btn-warning btn-block my-2" onclick="location.href='/employee/create'">Kişi Ekle</button>
                     <button class="btn btn-warning btn-block my-2" onclick="location.href='/employee/list'">Kişi Listele</button>
                     <button class="btn btn-warning btn-block my-2" onclick="location.href='/KontraktEkle'">Kontrakt Ekle</button>
                     <button class="btn btn-warning btn-block my-2" onclick="location.href='/KontraktListele'">Kontrakt Listele</button>
-                    <button class="btn btn-warning btn-block my-2" onclick="location.href='/FirmaEkle'">Firma Ekle</button>
                     <button class="btn btn-warning btn-block my-2" onclick="location.href='/GrupEkle'">Grup Ekle</button>
                     <button class="btn btn-warning btn-block my-2" onclick="location.href='/GrupEkle'">Grup Listele</button>
                     <button class="btn btn-warning btn-block my-2" onclick="location.href='/GrupEkle'">Workplace Ekle</button>
@@ -86,12 +85,18 @@
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
     <script>
         $(document).ready(function () {
+            const token = Cookies.get('authToken');
             function loadOffices() {
                 $.ajax({
                     url: 'https://localhost:44384/api/office/all',
                     type: 'GET',
+                    headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
                     success: function (data) {
                         populateOffices(data);
                     },
@@ -122,6 +127,10 @@
                 $.ajax({
                     url: 'https://localhost:44384/api/office/' + officeId + '/active-workplaces',
                     type: 'GET',
+                    headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
                     success: function (data) {
                         populateWorkplaces(data);
                     },
@@ -151,6 +160,10 @@
                 $.ajax({
                     url: 'https://localhost:44384/api/contracts/byworkplace/' + workplaceId + '/employees',
                     type: 'GET',
+                    headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
                     success: function (data) {
                         displayEmployeeNames(data);
                     },

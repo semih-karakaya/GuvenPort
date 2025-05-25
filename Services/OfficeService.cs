@@ -3,10 +3,13 @@
 public class OfficeService
 {
     private readonly HttpClient _httpClient;
+    private readonly IHttpContextAccessor _contextAccessor;
 
-    public OfficeService(HttpClient httpClient)
+    public OfficeService(HttpClient httpClient, IHttpContextAccessor contextAccessor)
     {
-        _httpClient = httpClient;
+        _contextAccessor = contextAccessor;
+        var httphelpernew = new httpHelpers();
+        _httpClient = httphelpernew.HttpHelper(httpClient, contextAccessor);
     }
 
     public async Task<List<OfficeDto>> ListOfficesAsync()

@@ -1,0 +1,125 @@
+﻿@{
+    ViewData["Title"] = "Yeni Çalışan Ekle";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Yeni Çalışan Ekle</h2>
+    <form id="addEmployeeForm">
+        <div class="form-group">
+            <label for="startDate">Başlangıç Tarihi</label>
+            <input type="date" class="form-control" id="startDate" required />
+        </div>
+        <div class="form-group">
+            <label for="endDate">Bitiş Tarihi</label>
+            <input type="date" class="form-control" id="endDate" required />
+        </div>
+        <div class="form-group">
+            <label for="workplace">Ofis Seçiniz</label>
+            <select class="form-control" id="workplace" required>
+                <option value="">Seçin</option>
+                <!-- Ofisler buraya dinamik olarak eklenecek -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="employee">Çalışan Seçiniz</label>
+            <select class="form-control" id="employee" required>
+                <option value="">Seçin</option>
+                <!-- Çalışanlar buraya dinamik olarak eklenecek -->
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Ekle</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const token = Cookies.get('authToken');
+            loadWorkplaces(); // Ofisleri yükle
+            loadEmployees(); // Çalışanları yükle
+
+            $("#addEmployeeForm").submit(function (event) {
+                event.preventDefault(); // Formun otomatik gönderimini engelle
+                addEmployee(); // Yeni çalışan ekleme fonksiyonunu çağır
+            });
+        });
+
+        function loadWorkplaces() {
+            $.ajax({
+                url: 'https://localhost:44384/api/workplaces', // Ofisleri getiren API
+                type: 'GET',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
+                success: function (data) {
+                    const workplaceSelect = $('#workplace');
+                    workplaceSelect.empty();
+                    workplaceSelect.append('<option value="">Seçin</option>'); // İlk seçenek boş
+                    $.each(data, function (i, workplace) {
+                        workplaceSelect.append(`<option value="${workplace.id}">${workplace.name}</option>`); // İsim ve ID'sini ekle
+                    });
+                },
+                error: function () {
+                    console.error("Ofisler yüklenirken bir hata oluştu.");
+                }
+            });
+        }
+
+        function loadEmployees() {
+            $.ajax({
+                url: 'https://localhost:44384/api/employees/list', // Çalışanları getiren API
+                type: 'GET',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
+                success: function (data) {
+                    const employeeSelect = $('#employee');
+                    employeeSelect.empty();
+                    employeeSelect.append('<option value="">Seçin</option>'); // İlk seçenek boş
+                    $.each(data, function (i, employee) {
+                        employeeSelect.append(`<option value="${employee.id}">${employee.name}</option>`); // İsim ve ID'sini ekle
+                    });
+                },
+                error: function () {
+                    console.error("Çalışanlar yüklenirken bir hata oluştu.");
+                }
+            });
+        }
+
+        function addEmployee() {
+            const startDate = $("#startDate").val();
+            const endDate = $("#endDate").val();
+            const idWorkplace = $("#workplace").val();
+            const idEmployee = $("#employee").val();
+
+            const employeeData = {
+                startDate: startDate,
+                endDate: endDate,
+                idWorkplace: Number(idWorkplace),
+                idEmployee: Number(idEmployee)
+            };
+
+            $.ajax({
+                url: 'https://localhost:44384/api/contracts/add', // Yeni çalışan ekle
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(employeeData),
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
+                success: function () {
+                    alert("Yeni çalışan başarıyla eklendi!");
+                    $("#addEmployeeForm")[0].reset(); // Formu temizle
+                },
+                error: function () {
+                    console.error("Yeni çalışan eklenirken bir hata oluştu.");
+                }
+            });
+        }
+    </script>
+}

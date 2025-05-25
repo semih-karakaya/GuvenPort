@@ -30,21 +30,29 @@
         </table>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
     <script>
         $(document).ready(function () {
+            
             fetchAccidents();
         });
 
         function fetchAccidents() {
-            fetch('https://localhost:44384/api/accident/ListAccidents')
-                .then(response => response.json())
-                .then(data => {
+            const token = Cookies.get('authToken');
+            $.ajax({
+                url: 'https://localhost:44384/api/accident/ListAccidents',
+                method: 'GET',
+                dataType: 'json',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
+                success: function (data) {
                     const tableBody = $('#accidentTableBody');
-                    tableBody.empty(); // Önce mevcut içeriği temizle
+                    tableBody.empty();
 
-                    const rows = data.map(accident => {
-                        // Çalışma yeri adını çekmek için API çağrısı yapılır
-                        return fetchWorkplaceName(accident.idWorkplace).then(workplaceName => {
+                    const rowPromises = data.map(function (accident) {
+                        return fetchWorkplaceName(accident.idWorkplace).then(function (workplaceName) {
                             return `
                                 <tr>
                                     <td>${accident.id}</td>
@@ -52,7 +60,7 @@
                                     <td>${accident.accTime}</td>
                                     <td>${accident.fatality ? 'Evet' : 'Hayır'}</td>
                                     <td>${accident.storyOfAccident}</td>
-                                    <td>${workplaceName}</td> <!-- Çalışma yerinin ismi burada gösterilecek -->
+                                    <td>${workplaceName}</td>
                                     <td>
                                         <button class="btn btn-primary btn-sm" onclick="updateAccident(${accident.id})">Güncelle</button>
                                         <button class="btn btn-danger btn-sm" onclick="deleteAccident(${accident.id})">Sil</button>
@@ -61,45 +69,51 @@
                         });
                     });
 
-                    // Tüm fetch işlemleri bitene kadar bekleyin
-                    Promise.all(rows).then(rowsHtml => {
-                        tableBody.append(rowsHtml.join('')); // Tüm satırları ekleyin
-                        $('#accidentTable').DataTable(); // DataTables'i başlat
+                    Promise.all(rowPromises).then(function (rowsHtml) {
+                        tableBody.append(rowsHtml.join(''));
+                        $('#accidentTable').DataTable();
                     });
-                })
-                .catch(error => console.error('Hata:', error));
+                },
+                error: function (xhr, status, error) {
+                    console.error('Hata:', error);
+                }
+            });
         }
 
         function fetchWorkplaceName(id) {
-            return fetch(`https://localhost:44384/api/workplace/GetWorkplaceName/${id}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Çalışma yeri adı alınamadı');
-                    }
-                    return response.text(); // Çalışma yeri adını döndür
-                });
+            const token = Cookies.get('authToken');
+            return $.ajax({
+                url: `https://localhost:44384/api/workplace/GetWorkplaceName/${id}`,
+                method: 'GET',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            }
+            });
         }
 
         function updateAccident(id) {
-            // Güncelleme işlemi için gerekli fonksiyon
             alert(`Güncelleme fonksiyonu tetiklendi. ID: ${id}`);
-            // Burada güncelleme sayfasına yönlendirme veya modal açmalısınız
         }
 
         function deleteAccident(id) {
+            const token = Cookies.get('authToken');
             if (confirm('Bu kazayı silmek istediğinize emin misiniz?')) {
-                fetch(`https://localhost:44384/api/accident/DeleteAccident/${id}`, {
-                    method: 'DELETE'
-                })
-                .then(response => {
-                    if (response.ok) {
+                $.ajax({
+                    url: `https://localhost:44384/api/accident/DeleteAccident/${id}`,
+                    method: 'DELETE',
+                    headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
+                    success: function () {
                         alert('Kaza başarıyla silindi!');
-                        fetchAccidents(); // Listeyi güncelle
-                    } else {
+                        fetchAccidents();
+                    },
+                    error: function () {
                         alert('Silme işlemi sırasında hata oluştu.');
                     }
-                })
-                .catch(error => console.error('Hata:', error));
+                });
             }
         }
     </script>

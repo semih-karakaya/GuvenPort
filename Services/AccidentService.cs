@@ -23,8 +23,9 @@ namespace guvenport.Services
 
         public AccidentService(HttpClient httpClient, IHttpContextAccessor contextAccessor)
         {
-            _httpClient = httpClient;
             _contextAccessor = contextAccessor;
+            var httphelpernew = new httpHelpers();
+            _httpClient = httphelpernew.HttpHelper(httpClient, contextAccessor);
         }
 
         public async Task<IEnumerable<AccidentDto>> ListAccidentsAsync()

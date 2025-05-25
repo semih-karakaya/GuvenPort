@@ -12,4 +12,7 @@
     public interface IEmployeeService 
     { 
     }
+    public interface IMedicalExaminationService
+    {
+    }
 }

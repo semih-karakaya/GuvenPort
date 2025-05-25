@@ -90,10 +90,12 @@
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
     <script>
-        $(document).ready(function () {
-            loadOffices(); // Sayfa yüklendiğinde ofisleri yükle
 
+        $(document).ready(function () {
+            const token = Cookies.get('authToken');
+            loadOffices(); // Sayfa yüklendiğinde ofisleri yükle
             $('#officeSelect').on('change', function () {
                 const officeId = $(this).val();
                 $('#workplaceSelect').prop('disabled', !officeId);
@@ -125,6 +127,10 @@
             $.ajax({
                 url: 'https://localhost:44384/api/office/all',
                 type: 'GET',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
                 success: function (data) {
                     console.log("Ofisler başarıyla yüklendi:", data);
                     populateOffices(data);
@@ -146,6 +152,10 @@
             $.ajax({
                 url: `https://localhost:44384/api/office/${officeId}/active-workplaces`,
                 type: 'GET',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
                 success: function (data) {
                     populateWorkplaces(data);
                 },
@@ -166,6 +176,10 @@
             $.ajax({
                 url: 'https://localhost:44384/api/staff/ListStaff',
                 type: 'GET',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
                 success: function (data) {
                     populateDoctors(data);
                 },
@@ -188,6 +202,10 @@
             $.ajax({
                 url: `https://localhost:44384/api/contracts/byworkplace/${workplaceId}/employees`,
                 type: 'GET',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
                 success: function (data) {
                     populateContracts(data);
                 },

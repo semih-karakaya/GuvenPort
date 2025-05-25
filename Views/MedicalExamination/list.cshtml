@@ -1,0 +1,159 @@
+﻿@{
+    ViewData["Title"] = "Tıbbi Muayeneler";
+}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js" defer></script>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Tıbbi Muayeneler</h2>
+    <table id="medicalExaminationTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Muayene Tarihi</th>
+                <th>Geçerlilik Tarihi</th>
+                <th>Doktor</th>
+                <th>Muayne Edilen</th>
+                <th>Dosya Yeri</th>
+                <th>Muayene Tipi</th>
+                <th>Aksiyonlar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Tablo içeriği buraya dinamik olarak yüklenecek -->
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const token = Cookies.get('authToken');
+            loadMedicalExaminations(); // Kayıtları yükle
+            $('#medicalExaminationTable').DataTable(); // DataTables ile tabloyu başlat
+        });
+
+        function loadMedicalExaminations() {
+            const token = Cookies.get('authToken');
+            // Muayene kayıtlarını çeken API
+            $.ajax({
+                url: 'https://localhost:44384/api/medicalexamination/ListMedicalExaminations',
+                type: 'GET',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
+                success: function (data) {
+                    populateTable(data);
+                },
+                error: function () {
+                    console.error("Kayıtlar yüklenirken bir hata oluştu.");
+                }
+            });
+        }
+
+                function populateTable(examinations) {
+            const tableBody = $('#medicalExaminationTable tbody');
+            tableBody.empty(); // Önceki içeriği temizle
+
+            $.each(examinations, function (i, examination) {
+                const examinationType = getExaminationTypeName(examination.examinationType); // Güncellenen "examinationType" alanının kullanımı
+
+                // Doktor adını almak için API çağrısı
+                loadDoctorName(examination.idDoctor).done(function(doctorNameResponse) {
+                    const doctorName = doctorNameResponse.name || "Belirtilmemiş"; // Doktor adını al, yoksa varsayılan değer kullan
+
+                    // Kontrat çalışan isimlerini almak için API çağrısını yap
+                    loadContractEmployeeNames(examination.idContract).done(function(employeeResponse) {
+                        if (Array.isArray(employeeResponse) && employeeResponse.length > 0 && employeeResponse[0].employees) {
+                            const employeeNames = employeeResponse[0].employees.map(emp => emp.name || "İsim Bulunamadı").join(', ');
+
+                            tableBody.append(`
+                                <tr>
+                                    <td>${examination.id}</td>
+                                    <td>${examination.date}</td>
+                                    <td>${examination.validityDate}</td>
+                                    <td>${doctorName}</td>
+                                    <td>${employeeNames}</td>
+                                    <td>${examination.exFileLocation}</td>
+                                    <td>${examinationType}</td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm" onclick="editExamination(${examination.id})">Güncelle</button>
+                                        <button class="btn btn-danger btn-sm" onclick="deleteExamination(${examination.id})">Sil</button>
+                                    </td>
+                                </tr>
+                            `);
+                        } else {
+                            console.error("Çalışan verisi alınamadı:", employeeResponse);
+                        }
+                    });
+                });
+            });
+        }
+
+
+        function loadDoctorName(doctorId) {
+            const token = Cookies.get('authToken');
+            return $.ajax({
+                url: `https://localhost:44384/api/staff/GetStaff/${doctorId}`, // Doktor için API çağrısı
+                type: 'GET',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
+            });
+        }
+
+        function loadContractEmployeeNames(contractId) {
+            const token = Cookies.get('authToken');
+            return $.ajax({
+                url: `https://localhost:44384/api/contracts/getnames/${contractId}`, // Çalışan isimlerini almak için API çağrısı
+                type: 'GET',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
+            });
+        }
+
+        function getExaminationTypeName(type) {
+            switch(type) {
+                case 1: return "Giriş";
+                case 2: return "Periyodik";
+                case 3: return "Kaza Sonrası";
+                default: return "Belirtilmemiş";
+            }
+        }
+
+        function editExamination(id) {
+            // Güncelleme formunu aç veya yeni bir sayfaya yönlendirme
+            alert(`Güncelleme için ID: ${id}`);
+            // Burada güncelleme işlemini gerçekleştirin.
+        }
+
+        function deleteExamination(id) {
+            const token = Cookies.get('authToken');
+            if(confirm("Bu kaydı silmek istediğinizden emin misiniz?")) {
+                $.ajax({
+                    url: `https://localhost:44384/api/medicalexamination/${id}`,
+                    type: 'DELETE',
+                    headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'text/plain'
+            },
+                    success: function () {
+                        loadMedicalExaminations(); // Silme işlemi sonrası tabloyu yeniden yükle
+                        alert("Kayıt başarıyla silindi.");
+                    },
+                    error: function () {
+                        console.error("Silme işlemi sırasında hata oluştu.");
+                        alert("Silme işlemi başarısız.");
+                    }
+                });
+            }
+        }
+    </script>
+}
