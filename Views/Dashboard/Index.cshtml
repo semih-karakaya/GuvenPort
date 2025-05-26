@@ -1,335 +1,579 @@
 ﻿@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_Layout";
+}
 
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>@ViewData["Title"] - Ofis Yönetimi</title>
+<!-- Dashboard Ana Container -->
+<div class="dashboard-container">
 
-  <link rel="stylesheet"
-        href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="dashboard-title">
+                    <i class="fas fa-tachometer-alt me-3"></i>
+                    İSG Yönetim Paneli
+                </h1>
+                <p class="dashboard-subtitle">İş Sağlığı ve Güvenliği Merkezi Kontrol Paneli</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="dashboard-date">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    <span id="currentDate"></span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
-        rel="stylesheet" />
-
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-        rel="stylesheet" />
-
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-        rel="stylesheet" />
-
-</head>
-
-<body>
-  <div class="container mt-5">
-    <h2 class="text-center mb-4">Ofis, Çalışma Yeri ve Aktif Kontrakt Yönetimi</h2>
-
+    <!-- İstatistik Kartları -->
     <div class="row mb-4">
-      <div class="col-md-6" data-aos="fade-up">
-        <div class="card text-white bg-info mb-3">
-          <div class="card-header">Toplam Aktif Ofisler</div>
-          <div class="card-body">
-            <h5 class="card-title">
-              <span id="cntOffices">0</span>
-            </h5>
-          </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card stats-card-primary" data-aos="fade-up" data-aos-delay="100">
+                <div class="stats-card-body">
+                    <div class="stats-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="stats-content">
+                        <h3 class="stats-number" id="cntOffices">@Model.TotalActiveOffices</h3>
+                        <p class="stats-label">Aktif Ofis</p>
+                    </div>
+                </div>
+                <div class="stats-card-footer">
+                    <a href="/Office/List" class="stats-link">
+                        Detayları Görüntüle <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
-        <div class="card text-white bg-success mb-3">
-          <div class="card-header">Toplam Aktif Çalışma Yerleri</div>
-          <div class="card-body">
-            <h5 class="card-title">
-              <span id="cntWorkplaces">0</span>
-            </h5>
-          </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card stats-card-success" data-aos="fade-up" data-aos-delay="200">
+                <div class="stats-card-body">
+                    <div class="stats-icon">
+                        <i class="fas fa-hard-hat"></i>
+                    </div>
+                    <div class="stats-content">
+                        <h3 class="stats-number" id="cntWorkplaces">@Model.TotalActiveCompanies</h3>
+                        <p class="stats-label">Çalışma Yeri</p>
+                    </div>
+                </div>
+                <div class="stats-card-footer">
+                    <a href="/Workplace/List" class="stats-link">
+                        Detayları Görüntüle <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <div class="form-group">
-      <label for="officeSelect">Ofis Seçin</label>
-      <select id="officeSelect" class="form-control">
-        <option value="">Ofis Seçin...</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="workplaceSelect">Çalışma Yeri Seçin</label>
-      <select id="workplaceSelect" class="form-control" disabled>
-        <option value="">Önce bir ofis seçin...</option>
-      </select>
-    </div>
-
-    <div id="employeeNamesContainer"
-         class="mb-4 p-2 border rounded"
-         style="max-height:200px; overflow-y:auto;">
-      <h5>Çalışanlar:</h5>
-      <div id="employeeNames"></div>
-    </div>
-
-    <input type="hidden" id="selectedEmployeeIds" />
-    <input type="hidden" id="selectedContractId" />
-
-    <div class="modal fade" id="mainFormModal" tabindex="-1">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Ana Form</h5>
-            <button type="button" class="close"
-                    data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <button class="btn btn-warning btn-block my-2"
-                    onclick="location.href='/accident/create'">
-              Kaza Ekle
-            </button>
-            <button class="btn btn-warning btn-block my-2"
-                    onclick="location.href='/accident/list'">
-              Kaza Listele
-            </button>
-            <button class="btn btn-warning btn-block my-2"
-                    onclick="location.href='/medex/create'">
-              Muayene Ekle
-            </button>
-            <button id="medexListBtn"
-                    class="btn btn-warning btn-block my-2">
-             Muayene Listele
-            </button>
-            <button class="btn btn-warning btn-block my-2"
-                    onclick="location.href='/employee/create'">
-              Kişi Ekle
-            </button>
-            <button class="btn btn-warning btn-block my-2"
-                    onclick="location.href='/employee/list'">
-              Kişi Listele
-            </button>
-            <button class="btn btn-warning btn-block my-2"
-                    onclick="location.href='/Contract/create'">
-              Kontrakt Ekle
-            </button>
-            <button class="btn btn-warning btn-block my-2"
-                    onclick="location.href='/Contract/list'">
-              Kontrakt Listele
-            </button>
-            <button class="btn btn-warning btn-block my-2"
-                    onclick="location.href='/Office/Create'">
-              Ofis Ekle
-            </button>
-            <button class="btn btn-warning btn-block my-2"
-                    onclick="location.href='/Office/List'">
-              Ofis Listele
-            </button>
-            <button class="btn btn-warning btn-block my-2"
-                    onclick="location.href='/Workplace/Create'">
-              Workplace Ekle
-            </button>
-            <button class="btn btn-warning btn-block my-2"
-                    onclick="location.href='/Workplace/List'">
-              Workplace Listele
-            </button>
-          </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card stats-card-warning" data-aos="fade-up" data-aos-delay="300">
+                <div class="stats-card-body">
+                    <div class="stats-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stats-content">
+                        <h3 class="stats-number" id="cntEmployees">0</h3>
+                        <p class="stats-label">Toplam Çalışan</p>
+                    </div>
+                </div>
+                <div class="stats-card-footer">
+                    <a href="/employee/list" class="stats-link">
+                        Detayları Görüntüle <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card stats-card-danger" data-aos="fade-up" data-aos-delay="400">
+                <div class="stats-card-body">
+                    <div class="stats-icon">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <div class="stats-content">
+                        <h3 class="stats-number" id="cntContracts">0</h3>
+                        <p class="stats-label">Aktif Kontrat</p>
+                    </div>
+                </div>
+                <div class="stats-card-footer">
+                    <a href="/Contract/list" class="stats-link">
+                        Detayları Görüntüle <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="form-group mt-4">
-      <button id="openMainFormButton"
-              class="btn btn-secondary btn-block">
-        Ana Formu Aç
-      </button>
+    <!-- Hızlı Erişim Menüsü -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="quick-access-card" data-aos="fade-up" data-aos-delay="500">
+                <div class="quick-access-header">
+                    <h4><i class="fas fa-bolt me-2"></i>Hızlı Erişim Menüsü</h4>
+                    <p>Sık kullanılan işlemler için hızlı erişim</p>
+                </div>
+
+                <!-- Offcanvas Menü Butonu (Mobil) -->
+                <div class="d-lg-none mb-3">
+                    <button class="btn btn-primary btn-lg w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#mainOffcanvas">
+                        <i class="fas fa-bars me-2"></i>Menüyü Aç
+                    </button>
+                </div>
+
+                <!-- Masaüstü Menü -->
+                <div class="d-none d-lg-block">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="quick-menu-section">
+                                <h5><i class="fas fa-list me-2"></i>Listeleme İşlemleri</h5>
+                                <div class="quick-menu-grid">
+                                    <a href="/accident/list" class="quick-menu-item">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>Kaza Listesi</span>
+                                    </a>
+                                    <a href="/medex/list" class="quick-menu-item" id="medexListLink">
+                                        <i class="fas fa-stethoscope"></i>
+                                        <span>Muayene Listesi</span>
+                                    </a>
+                                    <a href="/employee/list" class="quick-menu-item">
+                                        <i class="fas fa-users"></i>
+                                        <span>Çalışan Listesi</span>
+                                    </a>
+                                    <a href="/Contract/list" class="quick-menu-item">
+                                        <i class="fas fa-file-contract"></i>
+                                        <span>Kontrat Listesi</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="quick-menu-section">
+                                <h5><i class="fas fa-plus me-2"></i>Yeni Kayıt Ekleme</h5>
+                                <div class="quick-menu-grid">
+                                    <a href="/employee/create" class="quick-menu-item">
+                                        <i class="fas fa-user-plus"></i>
+                                        <span>Kişi Ekle</span>
+                                    </a>
+                                    <a href="/Contract/create" class="quick-menu-item">
+                                        <i class="fas fa-file-plus"></i>
+                                        <span>Kontrat Ekle</span>
+                                    </a>
+                                    <a href="/Office/Create" class="quick-menu-item">
+                                        <i class="fas fa-building"></i>
+                                        <span>Ofis Ekle</span>
+                                    </a>
+                                    <a href="/Workplace/Create" class="quick-menu-item">
+                                        <i class="fas fa-hard-hat"></i>
+                                        <span>Çalışma Yeri Ekle</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script
-    src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js">
-  </script>
-  <script
-    src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js">
-  </script>
+    <!-- İş Akışı Seçimi -->
+    <div class="row">
+        <div class="col-12">
+            <div class="workflow-card" data-aos="fade-up" data-aos-delay="600">
+                <div class="workflow-header">
+                    <h4><i class="fas fa-sitemap me-2"></i>İş Akışı - Kaza ve Muayene Kayıt Sistemi</h4>
+                    <p>Hızlı kaza ve muayene kaydı için aşağıdaki adımları takip edin</p>
+                </div>
 
-  <script
-    src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js">
-  </script>
-  <script
-    src="https://cdn.jsdelivr.net/npm/countup.js@2.0.8/dist/countUp.umd.js">
-  </script>
-  <script
-    src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
-  </script>
-  <script
-    src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js">
-  </script>
+                <!-- Ofis Seçimi -->
+                <div class="workflow-step">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <h5>Ofis Seçimi</h5>
+                    </div>
+                    <div id="officesContainer" class="selection-container">
+                        <div class="loading-indicator" id="officesLoadingIndicator">
+                            <div class="spinner-border me-2" role="status"></div>
+                            Ofisler yükleniyor...
+                        </div>
+                    </div>
+                </div>
 
-  <script>
-  $(function(){
-           const token   = Cookies.get('authToken') || '';
-          const headers = { 'Authorization': 'Bearer ' + token };
-          const $btn    = $('#medexListBtn');
+                <!-- Çalışma Yeri Seçimi -->
+                <div class="workflow-step" id="workplaceStep" style="display:none;">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <h5>Çalışma Yeri Seçimi</h5>
+                    </div>
+                    <div id="workplacesContainer" class="selection-container">
+                        <!-- Çalışma yeri kartları yüklenecek -->
+                    </div>
+                </div>
 
-          $btn.prop('disabled', true);
+                <!-- Çalışan Seçimi -->
+                <div class="workflow-step" id="employeeStep" style="display:none;">
+                    <div class="step-header">
+                        <span class="step-number">3</span>
+                        <h5>Çalışan Seçimi</h5>
+                    </div>
+                    <div id="employeesContainer" class="selection-container">
+                        <div id="employeeNames" class="employee-buttons-container">
+                            <!-- Çalışan butonları yüklenecek -->
+                        </div>
+                    </div>
+                </div>
 
-          $.ajax({
-                  url: 'https://localhost:44384/api/diag/whoami',
-            type: 'GET',
-            headers: headers
-          })
-          .done(function(info){
-            const targetUrl = info.claimIsDoctor
-              ? '/medex/list'
-              : '/medex/litelist';
+                <!-- Seçili Çalışan İşlemleri -->
+                <div class="workflow-step" id="actionsStep" style="display:none;">
+                    <div class="step-header">
+                        <span class="step-number">4</span>
+                        <h5>İşlem Seçimi</h5>
+                    </div>
+                    <div class="selected-employee-info">
+                        <div class="alert alert-info">
+                            <i class="fas fa-user-check me-2"></i>
+                            <strong>Seçili Çalışan:</strong> <span id="selectedEmployeeName"></span>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-warning btn-lg me-3" id="addAccidentButton">
+                                <i class="fas fa-plus-circle me-2"></i>Kaza Kaydı Ekle
+                            </button>
+                            <button class="btn btn-success btn-lg" id="addMedexButton">
+                                <i class="fas fa-plus-circle me-2"></i>Muayene Kaydı Ekle
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            $btn.prop('disabled', false)
-                .off('click')
-                .on('click', () => location.href = targetUrl);
-          })
-          .fail(function(){
-            console.warn('whoami çağrısı başarısız, medex/list default');
-            $btn.prop('disabled', false)
-                .off('click')
-                .on('click', () => location.href = '/medex/list');
-          });
-    AOS.init({ duration:800, once:true });
+</div>
 
-    const offVal = @Model.TotalActiveOffices;
-    const wpVal  = @Model.TotalActiveCompanies;
+<!-- Offcanvas Menü -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="mainOffcanvas">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">
+            <i class="fas fa-shield-alt me-2"></i>İSG Yönetim Menüsü
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="offcanvas-menu">
+            <h6>Listeleme İşlemleri</h6>
+            <a href="/accident/list" class="offcanvas-menu-item">
+                <i class="fas fa-exclamation-triangle"></i>Kaza Listesi
+            </a>
+            <a href="/medex/list" class="offcanvas-menu-item" id="sidebarMedexListBtn">
+                <i class="fas fa-stethoscope"></i>Muayene Listesi
+            </a>
+            <a href="/employee/list" class="offcanvas-menu-item">
+                <i class="fas fa-users"></i>Çalışan Listesi
+            </a>
+            <a href="/Contract/list" class="offcanvas-menu-item">
+                <i class="fas fa-file-contract"></i>Kontrat Listesi
+            </a>
+            <a href="/Office/List" class="offcanvas-menu-item">
+                <i class="fas fa-building"></i>Ofis Listesi
+            </a>
+            <a href="/Workplace/List" class="offcanvas-menu-item">
+                <i class="fas fa-hard-hat"></i>Çalışma Yeri Listesi
+            </a>
+
+            <hr class="my-3">
+
+            <h6>Yeni Kayıt Ekleme</h6>
+            <a href="/employee/create" class="offcanvas-menu-item">
+                <i class="fas fa-user-plus"></i>Kişi Ekle
+            </a>
+            <a href="/Contract/create" class="offcanvas-menu-item">
+                <i class="fas fa-file-plus"></i>Kontrat Ekle
+            </a>
+            <a href="/Office/Create" class="offcanvas-menu-item">
+                <i class="fas fa-building"></i>Ofis Ekle
+            </a>
+            <a href="/Workplace/Create" class="offcanvas-menu-item">
+                <i class="fas fa-hard-hat"></i>Çalışma Yeri Ekle
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden Inputs -->
+<input type="hidden" id="selectedEmployeeId" />
+<input type="hidden" id="selectedContractId" />
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/countup.js@2.0.8/dist/countUp.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+    <script>
+        $(function(){
+            // AOS Animation
+            AOS.init({ duration: 800, once: true });
+
+            // Tarih gösterimi
+            const now = new Date();
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            };
+            $('#currentDate').text(now.toLocaleDateString('tr-TR', options));
+
+            // Count Up Animasyonları
+            const offVal = @Model.TotalActiveOffices;
+            const wpVal = @Model.TotalActiveCompanies;
             const { CountUp } = countUp;
-        const opts = { duration: 2.5 };
-        const cOff = new CountUp('cntOffices', offVal, opts);
-        const cWp  = new CountUp('cntWorkplaces', wpVal, opts);
-    if (!cOff.error) cOff.start();
-    if (!cWp.error) cWp.start();
+            const opts = { duration: 2.5, separator: '.' };
 
-    // 3) confettti
-    Swal.fire({
-      
-      showConfirmButton: false,
-      timer: 1,
-      willClose: () => {
-        confetti({ particleCount: 80, spread: 60, origin:{ y:0.6 } });
-      }
-    });
+            const cOff = new CountUp('cntOffices', offVal, opts);
+            const cWp = new CountUp('cntWorkplaces', wpVal, opts);
 
+            if (!cOff.error) cOff.start();
+            if (!cWp.error) cWp.start();
 
+            // Hoş geldin animasyonu
+            setTimeout(() => {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }, 1000);
 
-    function loadOffices(){
-      $.ajax({
-        url: 'https://localhost:44384/api/office/all',
-        type: 'GET',
-        headers: headers,
-        success: populateOffices,
-        error: ()=> alert('Ofisler yüklenemedi!')
-      });
-    }
-    function populateOffices(list){
-      const $sel = $('#officeSelect').empty()
-                     .append('<option value="">Ofis Seçin...</option>');
-      list.forEach(o => {
-        $sel.append(`<option value="${o.id}">${o.officeName}</option>`);
-      });
-    }
+            // API Configuration
+            const token = Cookies.get('authToken') || '';
+            const headers = { 'Authorization': 'Bearer ' + token };
+            let isClaimDoctor = false;
 
-    $('#officeSelect').on('change', function(){
-      const officeId = $(this).val();
-      $('#workplaceSelect')
-        .prop('disabled', !officeId)
-        .empty()
-        .append('<option value="">Çalışma Yeri Seçin...</option>');
-      $('#employeeNames').empty();
-      $('#addInspectionButton').prop('disabled', true);
+            // Yetkilendirme kontrolü
+            $.ajax({
+                url: 'https://localhost:44384/api/diag/whoami',
+                type: 'GET',
+                headers: headers
+            })
+            .done(function(info){
+                isClaimDoctor = info.claimIsDoctor;
+                const medexListUrl = isClaimDoctor ? '/medex/list' : '/medex/litelist';
+                $('#sidebarMedexListBtn, #medexListLink').attr('href', medexListUrl);
 
-      if (officeId) loadWorkplaces(officeId);
-    });
+                setupMedexButton();
+            })
+            .fail(function(){
+                console.warn('Yetkilendirme kontrolü başarısız');
+                setupMedexButton();
+            });
 
-    function loadWorkplaces(officeId){
-      $.ajax({
-        url: `https://localhost:44384/api/office/${officeId}/active-workplaces`,
-        type: 'GET',
-        headers: headers,
-        success: list => {
-          const $sel = $('#workplaceSelect').prop('disabled', false);
-          list.forEach(w => {
-            $sel.append(`<option value="${w.id}">${w.name}</option>`);
-          });
-        },
-        error: ()=> alert('Çalışma yerleri yüklenemedi!')
-      });
-    }
+            function setupMedexButton() {
+                $('#addMedexButton').off('click').on('click', function(){
+                    const empId = $('#selectedEmployeeId').val();
+                    const contId = $('#selectedContractId').val();
 
-    $('#workplaceSelect').on('change', function(){
-      const wpId = $(this).val();
-      $('#employeeNames').empty();
-      $('#addInspectionButton').prop('disabled', true);
-      $('#selectedContractId').val('');
-      $('#selectedEmployeeIds').val('');
+                    if (!empId || !contId) {
+                        Swal.fire('Uyarı!', 'Lütfen önce bir çalışan seçiniz.', 'warning');
+                        return;
+                    }
+                    location.href = `/medex/create?employeeId=${empId}&contractId=${contId}&isDoctor=${isClaimDoctor}`;
+                });
+            }
 
-      if (wpId) loadEmployeesByWorkplace(wpId);
-    });
+            // Workflow Functions
+            function loadOffices(){
+                $('#officesLoadingIndicator').show();
+                $.ajax({
+                    url: 'https://localhost:44384/api/office/all',
+                    type: 'GET',
+                    headers: headers,
+                    success: function(list){
+                        $('#officesLoadingIndicator').hide();
+                        populateOffices(list);
+                    },
+                    error: function(){
+                        $('#officesLoadingIndicator').html(`
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Ofisler yüklenirken bir hata oluştu.
+                            </div>
+                        `);
+                    }
+                });
+            }
 
-    function loadEmployeesByWorkplace(wpId){
-      $.ajax({
-        url: `https://localhost:44384/api/contracts/byworkplace/${wpId}/employees`,
-        type: 'GET',
-        headers: headers,
-        success: displayEmployeeNames,
-        error: (xhr, s, e)=> {
-          console.error(e);
-          alert('Çalışanlar yüklenemedi!');
-        }
-      });
-    }
+            function populateOffices(list){
+                const $container = $('#officesContainer').empty();
+                if (list.length === 0) {
+                    $container.html('<div class="alert alert-info">Hiç aktif ofis bulunamadı.</div>');
+                    return;
+                }
 
-    function displayEmployeeNames(contracts){
-      let contractId, employeeIds = [];
-      contracts.forEach(c => {
-        if (c.employees.length){
-          contractId = c.id;
-          c.employees.forEach(emp => {
-            $('#employeeNames').append(`
-              <button class="employeeBtn btn btn-outline-primary btn-block my-1"
-                      data-employeeid="${emp.id}">
-                ${emp.name}
-              </button>`);
-          });
-        }
-      });
+                const $row = $('<div class="row"></div>');
+                list.forEach(o => {
+                    $row.append(`
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="selection-card" data-id="${o.id}" data-type="office">
+                                <div class="selection-card-body">
+                                    <div class="selection-icon">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <h6>${o.officeName}</h6>
+                                    <small class="text-muted">Çalışma Yeri: ${o.activeWorkplaceCount || 0}</small>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                });
+                $container.append($row);
 
-      $('.employeeBtn').on('click', function(){
-        $('.employeeBtn').removeClass('btn-primary')
-                         .addClass('btn-outline-primary');
-        $(this).removeClass('btn-outline-primary')
-               .addClass('btn-primary text-white');
+                $('.selection-card[data-type="office"]').on('click', function(){
+                    $('.selection-card[data-type="office"]').removeClass('selected');
+                    $(this).addClass('selected');
 
-        const empId = $(this).data('employeeid');
-        employeeIds = [empId];
-        $('#selectedEmployeeIds').val(empId);
-        $('#selectedContractId').val(contractId);
-        $('#addInspectionButton').prop('disabled', false);
-      });
+                    const officeId = $(this).data('id');
+                    loadWorkplaces(officeId);
 
+                    $('#workplaceStep').show();
+                    $('#employeeStep, #actionsStep').hide();
+                });
+            }
 
-      if ($('#employeeNames').children().length) {
-        $('#addInspectionButton').prop('disabled', false);
-      }
-    }
+            function loadWorkplaces(officeId){
+                $('#workplacesContainer').html('<div class="loading-indicator"><div class="spinner-border me-2"></div>Çalışma yerleri yükleniyor...</div>');
 
+                $.ajax({
+                    url: `https://localhost:44384/api/office/${officeId}/active-workplaces`,
+                    type: 'GET',
+                    headers: headers,
+                    success: function(list){
+                        populateWorkplaces(list);
+                    },
+                    error: function(){
+                        $('#workplacesContainer').html(`
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Çalışma yerleri yüklenemedi!
+                            </div>
+                        `);
+                    }
+                });
+            }
 
-    $('#addInspectionButton').on('click', function(){
-      const emp = encodeURIComponent($('#selectedEmployeeIds').val());
-      const con = encodeURIComponent($('#selectedContractId').val());
-      window.location.href = `/MuayeneEkle?employeeId=${emp}&contractId=${con}`;
-    });
+            function populateWorkplaces(list){
+                const $container = $('#workplacesContainer').empty();
+                if (list.length === 0) {
+                    $container.html('<div class="alert alert-info">Bu ofise bağlı aktif çalışma yeri bulunamadı.</div>');
+                    return;
+                }
 
+                const $row = $('<div class="row"></div>');
+                list.forEach(w => {
+                    $row.append(`
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="selection-card" data-id="${w.id}" data-type="workplace">
+                                <div class="selection-card-body">
+                                    <div class="selection-icon">
+                                        <i class="fas fa-hard-hat"></i>
+                                    </div>
+                                    <h6>${w.name}</h6>
+                                    <small class="text-muted">Kontrat: ${w.activeContractCount || 0}</small>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                });
+                $container.append($row);
 
-    $('#openMainFormButton').on('click', ()=> $('#mainFormModal').modal('show'));
+                $('.selection-card[data-type="workplace"]').on('click', function(){
+                    $('.selection-card[data-type="workplace"]').removeClass('selected');
+                    $(this).addClass('selected');
 
+                    const wpId = $(this).data('id');
+                    loadEmployeesByWorkplace(wpId);
 
-    loadOffices();
-  });
-  </script>
-</body>
-</html>
+                    $('#employeeStep').show();
+                    $('#actionsStep').hide();
+                });
+            }
+
+            function loadEmployeesByWorkplace(wpId){
+                $('#employeeNames').html('<div class="loading-indicator"><div class="spinner-border me-2"></div>Çalışanlar yükleniyor...</div>');
+
+                $.ajax({
+                    url: `https://localhost:44384/api/contracts/byworkplace/${wpId}/employees`,
+                    type: 'GET',
+                    headers: headers,
+                    success: function(contracts){
+                        populateEmployees(contracts);
+                    },
+                    error: function(){
+                        $('#employeeNames').html(`
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Çalışanlar yüklenemedi!
+                            </div>
+                        `);
+                    }
+                });
+            }
+
+            function populateEmployees(contracts){
+                $('#employeeNames').empty();
+                let anyEmployeeFound = false;
+
+                contracts.forEach(c => {
+                    if (c.employees && c.employees.length > 0){
+                        anyEmployeeFound = true;
+                        c.employees.forEach(emp => {
+                            $('#employeeNames').append(`
+                                <button class="employee-button"
+                                        data-employeeid="${emp.id}"
+                                        data-contractid="${c.id}"
+                                        data-employeename="${emp.name}">
+                                    <i class="fas fa-user me-2"></i>${emp.name}
+                                </button>
+                            `);
+                        });
+                    }
+                });
+
+                if (!anyEmployeeFound) {
+                    $('#employeeNames').html('<div class="alert alert-info">Bu çalışma yerinde aktif çalışan bulunamadı.</div>');
+                }
+
+                $('.employee-button').on('click', function(){
+                    $('.employee-button').removeClass('selected');
+                    $(this).addClass('selected');
+
+                    const empId = $(this).data('employeeid');
+                    const contId = $(this).data('contractid');
+                    const empName = $(this).data('employeename');
+
+                    $('#selectedEmployeeId').val(empId);
+                    $('#selectedContractId').val(contId);
+                    $('#selectedEmployeeName').text(empName);
+
+                    $('#actionsStep').show();
+                });
+            }
+
+            // Kaza Ekle butonu
+            $('#addAccidentButton').on('click', function(){
+                const empId = $('#selectedEmployeeId').val();
+                const contId = $('#selectedContractId').val();
+
+                if (!empId || !contId) {
+                    Swal.fire('Uyarı!', 'Seçili çalışan bilgileri eksik.', 'warning');
+                    return;
+                }
+                location.href = `/accident/create?employeeId=${empId}&contractId=${contId}`;
+            });
+
+            // Sayfa yüklendiğinde ofisleri getir
+            loadOffices();
+        });
+    </script>
+}

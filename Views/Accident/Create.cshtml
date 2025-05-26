@@ -1,278 +1,667 @@
 ﻿@model GuvenPortAPI.Models.AccidentCreateViewModel
 
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Kaza Ekle</h2>
+@{
+    ViewData["Title"] = "Yeni Kaza Kaydı Oluştur";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-    <form id="accidentForm">
-        <div class="form-group">
-            <label for="accDate">Kaza Tarihi</label>
-            <input type="date" id="accDate" class="form-control" required />
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+
+<!-- Custom CSS -->
+<link rel="stylesheet" href="~/css/accident-create.css">
+
+<div class="container">
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-plus-circle me-2"></i>Yeni Kaza Kaydı</h1>
+            <p>Detaylı kaza bilgilerini kaydedin ve takip edin</p>
         </div>
 
-        <div class="form-group">
-            <label for="accTime">Kaza Saati</label>
-            <input type="time" id="accTime" class="form-control" required />
-        </div>
-
-        <div class="form-group">
-            <label for="fatality">Ölüm Durumu</label>
-            <input type="checkbox" id="fatality" class="form-check-input" />
-        </div>
-
-        <div class="form-group">
-            <label for="injury">Yaralanma Durumu</label>
-            <input type="checkbox" id="injury" class="form-check-input" />
-        </div>
-
-        <div class="form-group">
-            <label for="propertyDamage">Mülk Hasarı Durumu</label>
-            <input type="checkbox" id="propertyDamage" class="form-check-input" />
-        </div>
-
-        <div class="form-group">
-            <label for="nearMiss">Yakın Geçiş Durumu</label>
-            <input type="checkbox" id="nearMiss" class="form-check-input" />
-        </div>
-
-        <div class="form-group">
-            <label for="storyOfAccident">Kaza Hikayesi</label>
-            <textarea id="storyOfAccident" class="form-control"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="officeSelect">Ofis Seçin</label>
-            <select id="officeSelect" class="form-control">
-                <option value="">Ofis Seçin...</option>
-               
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="workplaceSelect">Çalışma Yeri Seçin</label>
-            <select id="workplaceSelect" class="form-control" disabled>
-                <option value="">Çalışma Yeri Seçin...</option>
-              
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="sgkInfoDate">SGK Bilgi Tarihi</label>
-            <input type="date" id="sgkInfoDate" class="form-control" />
-        </div>
-
-        <div class="form-group">
-            <label for="sgkInfoCheck">SGK Bilgisi Kontrolü</label>
-            <input type="checkbox" id="sgkInfoCheck" class="form-check-input" />
-        </div>
-
-        <div class="form-group">
-            <label for="staffList">Doktorlar:</label>
-            <select id="staffList" class="form-control" multiple>
-                
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="contractList">Kontraktlar:</label>
-            <div id="contractList" class="form-control" style="height: 100px; overflow-y: auto;">
-               
+        <!-- Form Container -->
+        <div class="form-container">
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="progress-step active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Temel Bilgiler</div>
+                </div>
+                <div class="progress-step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Kaza Türü</div>
+                </div>
+                <div class="progress-step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Lokasyon</div>
+                </div>
+                <div class="progress-step" data-step="4">
+                    <div class="step-circle">4</div>
+                    <div class="step-label">Personel</div>
+                </div>
             </div>
+
+            <form id="accidentForm">
+                <!-- Temel Bilgiler -->
+                <div class="form-section" data-section="1">
+                    <h3 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Temel Kaza Bilgileri
+                    </h3>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="accDate">
+                                    <i class="fas fa-calendar-alt me-1"></i>Kaza Tarihi *
+                                </label>
+                                <input type="date" id="accDate" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="accTime">
+                                    <i class="fas fa-clock me-1"></i>Kaza Saati *
+                                </label>
+                                <input type="time" id="accTime" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="storyOfAccident">
+                            <i class="fas fa-file-alt me-1"></i>Kaza Hikayesi
+                        </label>
+                        <textarea id="storyOfAccident" class="form-control"
+                                  placeholder="Kazanın nasıl gerçekleştiğini detaylı bir şekilde açıklayın..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Kaza Türü -->
+                <div class="form-section" data-section="2">
+                    <h3 class="section-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Kaza Türü ve Sonuçları
+                    </h3>
+
+                    <div class="checkbox-group">
+                        <div class="checkbox-item" data-checkbox="fatality">
+                            <div class="checkmark"></div>
+                            <span><i class="fas fa-skull-crossbones me-2"></i>Ölüm Durumu</span>
+                            <input type="checkbox" id="fatality">
+                        </div>
+
+                        <div class="checkbox-item" data-checkbox="injury">
+                            <div class="checkmark"></div>
+                            <span><i class="fas fa-user-injured me-2"></i>Yaralanma Durumu</span>
+                            <input type="checkbox" id="injury">
+                        </div>
+
+                        <div class="checkbox-item" data-checkbox="propertyDamage">
+                            <div class="checkmark"></div>
+                            <span><i class="fas fa-hammer me-2"></i>Mülk Hasarı</span>
+                            <input type="checkbox" id="propertyDamage">
+                        </div>
+
+                        <div class="checkbox-item" data-checkbox="nearMiss">
+                            <div class="checkmark"></div>
+                            <span><i class="fas fa-exclamation me-2"></i>Yakın Geçiş</span>
+                            <input type="checkbox" id="nearMiss">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lokasyon Bilgileri -->
+                <div class="form-section" data-section="3">
+                    <h3 class="section-title">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Lokasyon Bilgileri
+                    </h3>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="officeSelect">
+                                    <i class="fas fa-building me-1"></i>Ofis Seçin *
+                                </label>
+                                <select id="officeSelect" class="form-select" required>
+                                    <option value="">Ofis Seçin...</option>
+                                </select>
+                                <div class="loading-overlay" id="officeLoading" style="display: none;">
+                                    <div class="loading-spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="workplaceSelect">
+                                    <i class="fas fa-industry me-1"></i>Çalışma Yeri Seçin *
+                                </label>
+                                <select id="workplaceSelect" class="form-select" disabled required>
+                                    <option value="">Çalışma Yeri Seçin...</option>
+                                </select>
+                                <div class="loading-overlay" id="workplaceLoading" style="display: none;">
+                                    <div class="loading-spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SGK Bilgileri -->
+                <div class="form-section" data-section="4">
+                    <h3 class="section-title">
+                        <i class="fas fa-shield-alt"></i>
+                        SGK Bilgileri
+                    </h3>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="sgkInfoDate">
+                                    <i class="fas fa-calendar me-1"></i>SGK Bilgi Tarihi
+                                </label>
+                                <input type="date" id="sgkInfoDate" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div class="checkbox-group">
+                                    <div class="checkbox-item" data-checkbox="sgkInfoCheck">
+                                        <div class="checkmark"></div>
+                                        <span><i class="fas fa-check-circle me-2"></i>SGK Bilgisi Kontrolü</span>
+                                        <input type="checkbox" id="sgkInfoCheck">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personel Seçimi -->
+                <div class="form-section" data-section="5">
+                    <h3 class="section-title">
+                        <i class="fas fa-users"></i>
+                        Personel Seçimi
+                    </h3>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="staffList">
+                                    <i class="fas fa-user-md me-1"></i>Doktorlar
+                                </label>
+                                <select id="staffList" class="form-select select-multiple" multiple>
+                                    <option disabled>Önce çalışma yeri seçiniz...</option>
+                                </select>
+                                <div class="loading-overlay" id="staffLoading" style="display: none;">
+                                    <div class="loading-spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-file-contract me-1"></i>Çalışanlar (Kontratlara Göre)
+                                </label>
+                                <div id="contractList" class="contract-container">
+                                    <!-- Contract data will be loaded here -->
+                                </div>
+                                <div class="loading-overlay" id="contractLoading" style="display: none;">
+                                    <div class="loading-spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden Fields -->
+                <input type="hidden" id="selectedEmployeeIds">
+                <input type="hidden" id="selectedContractId">
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-secondary" id="resetForm">
+                        <i class="fas fa-undo me-1"></i>Sıfırla
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-save me-1"></i>Kaydet
+                    </button>
+                </div>
+            </form>
         </div>
-
-        <input type="hidden" id="selectedEmployeeIds" />
-
-        <button type="submit" class="btn btn-primary">Kaydet</button>
-
-        <input type="hidden" id="selectedContractId" />
-
-    </form>
+    </div>
 </div>
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+
     <script>
-
         $(document).ready(function () {
-            const token = Cookies.get('authToken');
-            loadOffices(); 
-            $('#officeSelect').on('change', function () {
-                const officeId = $(this).val();
-                $('#workplaceSelect').prop('disabled', !officeId);
-                $('#workplaceSelect').empty().append('<option value="">Çalışma Yeri Seçin...</option>');
 
-                if (officeId) {
-                    loadWorkplaces(officeId);
-                }
-            });
+            // Initialize
+            loadOffices();
+            initializeCheckboxes();
+            initializeFormValidation();
+            setDefaultDate();
 
-            $('#workplaceSelect').on('change', function () {
-                const workplaceId = $(this).val();
-                $('#staffList').empty(); 
-                $('#contractList').empty(); 
+            // Event Listeners
+            $('#officeSelect').on('change', handleOfficeChange);
+            $('#workplaceSelect').on('change', handleWorkplaceChange);
+            $('#accidentForm').on('submit', handleFormSubmit);
+            $('#resetForm').on('click', handleFormReset);
 
-                if (workplaceId) {
-                    loadStaffByWorkplace(workplaceId);
-                    loadContractsByWorkplace(workplaceId);
-                }
-            });
-
-            $('#accidentForm').on('submit', function (e) {
-                e.preventDefault();
-                submitAccidentForm();
-            });
+            // Auto-save draft (optional)
+            setInterval(saveDraft, 30000); // Save every 30 seconds
         });
+
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            $('#accDate').val(today);
+        }
+
+        function initializeCheckboxes() {
+            $('.checkbox-item').on('click', function() {
+                const checkbox = $(this).find('input[type="checkbox"]');
+                const isChecked = !checkbox.prop('checked');
+
+                checkbox.prop('checked', isChecked);
+
+                if (isChecked) {
+                    $(this).addClass('checked');
+                } else {
+                    $(this).removeClass('checked');
+                }
+
+                // Animate
+                $(this).addClass('animate-pulse');
+                setTimeout(() => {
+                    $(this).removeClass('animate-pulse');
+                }, 200);
+            });
+        }
+
+        function initializeFormValidation() {
+            $('.form-control, .form-select').on('blur', function() {
+                validateField($(this));
+            });
+        }
+
+        function validateField(field) {
+            const value = field.val().trim();
+            const isRequired = field.prop('required');
+
+            if (isRequired && !value) {
+                field.addClass('is-invalid').removeClass('is-valid');
+                return false;
+            } else if (value) {
+                field.addClass('is-valid').removeClass('is-invalid');
+                return true;
+            } else {
+                field.removeClass('is-invalid is-valid');
+                return true;
+            }
+        }
+
+        function showLoading(elementId) {
+            $(`#${elementId}`).show();
+        }
+
+        function hideLoading(elementId) {
+            $(`#${elementId}`).hide();
+        }
 
         function loadOffices() {
             const token = Cookies.get('authToken');
+            showLoading('officeLoading');
+
             $.ajax({
                 url: 'https://localhost:44384/api/office/all',
                 type: 'GET',
                 headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                },
                 success: function (data) {
-                    console.log("Ofisler başarıyla yüklendi:", data);
                     populateOffices(data);
+                    hideLoading('officeLoading');
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Başarılı!',
+                        text: `${data.length} ofis yüklendi.`,
+                        showConfirmButton: false,
+                        timer: 1500,
+                        toast: true,
+                        position: 'top-end'
+                    });
                 },
                 error: function () {
-                    console.error("Ofisler yüklenirken bir hata oluştu.");
+                    hideLoading('officeLoading');
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: 'Ofisler yüklenirken bir hata oluştu.',
+                        confirmButtonText: 'Tekrar Dene'
+                    }).then(() => {
+                        loadOffices();
+                    });
                 }
             });
         }
 
         function populateOffices(offices) {
-            $('#officeSelect').empty().append('<option value="">Ofis Seçin...</option>');
+            const select = $('#officeSelect');
+            select.empty().append('<option value="">Ofis Seçin...</option>');
+
             $.each(offices, function (i, office) {
-                $('#officeSelect').append(`<option value="${office.id}">${office.officeName}</option>`);
+                select.append(`<option value="${office.id}">${office.officeName}</option>`);
             });
+        }
+
+        function handleOfficeChange() {
+            const officeId = $(this).val();
+            const workplaceSelect = $('#workplaceSelect');
+
+            workplaceSelect.prop('disabled', !officeId);
+            workplaceSelect.empty().append('<option value="">Çalışma Yeri Seçin...</option>');
+
+            // Clear dependent fields
+            $('#staffList').empty().append('<option disabled>Önce çalışma yeri seçiniz...</option>');
+            $('#contractList').empty();
+            $('#selectedEmployeeIds').val('');
+
+            if (officeId) {
+                loadWorkplaces(officeId);
+            }
         }
 
         function loadWorkplaces(officeId) {
             const token = Cookies.get('authToken');
+            showLoading('workplaceLoading');
+
             $.ajax({
                 url: `https://localhost:44384/api/office/${officeId}/active-workplaces`,
                 type: 'GET',
                 headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                },
                 success: function (data) {
                     populateWorkplaces(data);
+                    hideLoading('workplaceLoading');
                 },
                 error: function () {
-                    alert('Çalışma yerleri yüklenirken bir hata oluştu.');
+                    hideLoading('workplaceLoading');
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: 'Çalışma yerleri yüklenirken bir hata oluştu.',
+                        confirmButtonText: 'Tamam'
+                    });
                 }
             });
         }
 
         function populateWorkplaces(workplaces) {
-            $('#workplaceSelect').empty().append('<option value="">Çalışma Yeri Seçin...</option>');
+            const select = $('#workplaceSelect');
+            select.empty().append('<option value="">Çalışma Yeri Seçin...</option>');
+
             $.each(workplaces, function (i, workplace) {
-                $('#workplaceSelect').append(`<option value="${workplace.id}">${workplace.name}</option>`);
+                select.append(`<option value="${workplace.id}">${workplace.name}</option>`);
             });
+        }
+
+        function handleWorkplaceChange() {
+            const workplaceId = $(this).val();
+
+            // Clear dependent fields
+            $('#staffList').empty();
+            $('#contractList').empty();
+            $('#selectedEmployeeIds').val('');
+
+            if (workplaceId) {
+                loadStaffByWorkplace(workplaceId);
+                loadContractsByWorkplace(workplaceId);
+            } else {
+                $('#staffList').append('<option disabled>Önce çalışma yeri seçiniz...</option>');
+            }
         }
 
         function loadStaffByWorkplace(workplaceId) {
             const token = Cookies.get('authToken');
+            showLoading('staffLoading');
+
             $.ajax({
                 url: 'https://localhost:44384/api/staff/ListStaff',
                 type: 'GET',
                 headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                },
                 success: function (data) {
                     populateDoctors(data);
+                    hideLoading('staffLoading');
                 },
                 error: function () {
+                    hideLoading('staffLoading');
                     console.error("Doktorlar yüklenirken bir hata oluştu.");
                 }
             });
         }
 
         function populateDoctors(staff) {
-            $('#staffList').empty();
+            const select = $('#staffList');
+            select.empty();
+
             const activeDoctors = staff.filter(doctor => doctor.doctor !== null);
 
+            if (activeDoctors.length === 0) {
+                select.append('<option disabled>Doktor bulunamadı</option>');
+                return;
+            }
+
             $.each(activeDoctors, function (i, doctor) {
-                $('#staffList').append(`<option value="${doctor.id}">${doctor.name}</option>`);
+                select.append(`<option value="${doctor.id}">${doctor.name}</option>`);
             });
         }
 
         function loadContractsByWorkplace(workplaceId) {
             const token = Cookies.get('authToken');
+            showLoading('contractLoading');
+
             $.ajax({
                 url: `https://localhost:44384/api/contracts/byworkplace/${workplaceId}/employees`,
                 type: 'GET',
                 headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                },
                 success: function (data) {
                     populateContracts(data);
+                    hideLoading('contractLoading');
                 },
                 error: function () {
-                    alert('Kontraktlar yüklenirken bir hata oluştu.');
+                    hideLoading('contractLoading');
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: 'Kontraktlar yüklenirken bir hata oluştu.',
+                        confirmButtonText: 'Tamam'
+                    });
                 }
             });
         }
 
         function populateContracts(contracts) {
-            $('#contractList').empty(); 
+            const container = $('#contractList');
+            container.empty();
+
+            if (contracts.length === 0) {
+                container.html('<div class="text-center text-muted p-3">Kontrakt bulunamadı</div>');
+                return;
+            }
 
             $.each(contracts, function (i, contract) {
-                let contractDiv = $('<div>').append(`<strong>${contract.name}</strong>`);
+                let contractDiv = $(`
+                    <div class="contract-item">
+                        <div class="contract-name">
+                            <i class="fas fa-file-contract"></i>
+                            ${contract.name}
+                        </div>
+                    </div>
+                `);
 
-                
                 if (contract.employees && contract.employees.length > 0) {
-                    let employeeList = $('<ul>'); 
+                    let employeeList = $('<ul class="employee-list"></ul>');
+
                     $.each(contract.employees, function (j, employee) {
-                        let employeeItem = $('<li>').text(employee.name)
-                            .append(` <button class="employeeBtn btn btn-outline-primary" data-employeeid="${employee.id}" style="margin-left: 10px;">Seç</button>`); // Seç butonu ekle
-                        employeeList.append(employeeItem); 
+                        let employeeItem = $(`
+                            <li class="employee-item">
+                                <span class="employee-name">
+                                    <i class="fas fa-user me-2"></i>${employee.name}
+                                </span>
+                                <button class="employee-btn" data-employeeid="${employee.id}" type="button">
+                                    Seç
+                                </button>
+                            </li>
+                        `);
+                        employeeList.append(employeeItem);
                     });
-                    contractDiv.append(employeeList); 
+
+                    contractDiv.append(employeeList);
                 }
-                $('#contractList').append(contractDiv); 
+
+                container.append(contractDiv);
             });
 
-            
-                    $(document).on('click', '.employeeBtn', function (e) {
-            e.preventDefault(); 
-            var employeeId = $(this).data('employeeid'); 
-
-            let selectedIds = $('#selectedEmployeeIds').val().split(',').filter(Boolean); 
-
-            
-            if (!selectedIds.includes(employeeId.toString())) {
-                selectedIds.push(employeeId);
-                $('#selectedEmployeeIds').val(selectedIds.join(',')); 
-                $(this).data('selected', true); 
-                $(this).css({'background-color': '#007bff', 'color': 'white'});
-            } else {
-                
-                selectedIds = selectedIds.filter(id => id !== employeeId.toString());
-                $('#selectedEmployeeIds').val(selectedIds.join(',')); 
-                $(this).data('selected', false); 
-                $(this).css({'background-color': '', 'color': ''});
-            }
-        });
+            // Employee selection event
+            $(document).off('click', '.employee-btn').on('click', '.employee-btn', handleEmployeeSelection);
         }
 
-                function submitAccidentForm() {
+        function handleEmployeeSelection(e) {
+            e.preventDefault();
+
+            const button = $(this);
+            const employeeId = button.data('employeeid');
+            let selectedIds = $('#selectedEmployeeIds').val().split(',').filter(Boolean);
+
+            if (!button.hasClass('selected')) {
+                // Select employee
+                selectedIds.push(employeeId.toString());
+                button.addClass('selected').text('Seçili').prepend('<i class="fas fa-check me-1"></i>');
+
+                // Animate
+                button.addClass('animate-bounce');
+                setTimeout(() => button.removeClass('animate-bounce'), 300);
+            } else {
+                // Deselect employee
+                selectedIds = selectedIds.filter(id => id !== employeeId.toString());
+                button.removeClass('selected').html('Seç');
+            }
+
+            $('#selectedEmployeeIds').val(selectedIds.join(','));
+
+            // Update selection count
+            updateSelectionCount();
+        }
+
+        function updateSelectionCount() {
+            const count = $('#selectedEmployeeIds').val().split(',').filter(Boolean).length;
+            const staffCount = $('#staffList option:selected').length;
+
+            // Update UI to show selection count
+            if (count > 0 || staffCount > 0) {
+                showSelectionSummary(count, staffCount);
+            }
+        }
+
+        function showSelectionSummary(employeeCount, staffCount) {
+            let summaryText = '';
+            if (employeeCount > 0) summaryText += `${employeeCount} çalışan`;
+            if (employeeCount > 0 && staffCount > 0) summaryText += ' ve ';
+            if (staffCount > 0) summaryText += `${staffCount} doktor`;
+            if (summaryText) summaryText += ' seçildi.';
+
+            // You can show this in a small notification or status area
+            console.log(summaryText);
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            // Validate required fields
+            let isValid = true;
+            $('.form-control[required], .form-select[required]').each(function() {
+                if (!validateField($(this))) {
+                    isValid = false;
+                }
+            });
+
+            if (!isValid) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Eksik Bilgiler!',
+                    text: 'Lütfen tüm zorunlu alanları doldurun.',
+                    confirmButtonText: 'Tamam'
+                });
+                return;
+            }
+
+            // Show confirmation
+            Swal.fire({
+                title: 'Kaza Kaydını Onayla',
+                text: 'Kaza kaydını oluşturmak istediğinize emin misiniz?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Kaydet',
+                cancelButtonText: 'İptal',
+                confirmButtonColor: '#3498db'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitAccidentForm();
+                }
+            });
+        }
+
+        function submitAccidentForm() {
+            // Show loading
+            Swal.fire({
+                title: 'Kaydediliyor...',
+                text: 'Lütfen bekleyin',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Disable submit button
+            $('#submitBtn').prop('disabled', true);
+
             const selectedStaff = [...document.getElementById('staffList').options]
                 .filter(option => option.selected)
                 .map(option => parseInt(option.value));
 
-            
-            const selectedContracts = [];
-            $('#contractList .employeeBtn').each(function () {
-                if ($(this).data('selected')) { 
-                    selectedContracts.push(parseInt($(this).data('employeeid')));
-                }
-            });
+            const selectedContracts = $('#selectedEmployeeIds').val()
+                .split(',')
+                .filter(Boolean)
+                .map(id => parseInt(id));
 
             const accidentData = {
                 accDate: $('#accDate').val(),
@@ -283,37 +672,149 @@
                 nearMiss: $('#nearMiss').is(':checked'),
                 storyOfAccident: $('#storyOfAccident').val(),
                 idWorkplace: parseInt($('#workplaceSelect').val()),
-                sgkInfoDate: $('#sgkInfoDate').val(),
+                sgkInfoDate: $('#sgkInfoDate').val() || null,
                 sgkInfoCheck: $('#sgkInfoCheck').is(':checked'),
                 selectedStaffIds: selectedStaff,
-                selectedContractIds: selectedContracts 
+                selectedContractIds: selectedContracts
             };
 
-            console.log("Gönderilecek veri:", JSON.stringify(accidentData));
+            console.log("Gönderilecek veri:", JSON.stringify(accidentData, null, 2));
+
             const token = Cookies.get('authToken');
+
             fetch('https://localhost:44384/api/accident', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
-                    'Accept': 'text/plain'
-                }, 
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify(accidentData)
             })
             .then(response => {
                 if (response.ok) {
-                    alert('Kaza başarıyla kaydedildi!');
-                    $('#accidentForm')[0].reset(); 
+                    return response.json();
                 } else {
                     return response.json().then(err => {
                         throw new Error(err.message || 'Kayıt sırasında hata oluştu.');
                     });
                 }
             })
+            .then(data => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: 'Kaza kaydı başarıyla oluşturuldu.',
+                    confirmButtonText: 'Tamam',
+                    confirmButtonColor: '#27ae60'
+                }).then(() => {
+                    // Redirect to accident list or clear form
+                    window.location.href = '/accident/list';
+                    // Or: handleFormReset();
+                });
+            })
             .catch(error => {
                 console.error('Error:', error);
-                alert(error.message);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: error.message,
+                    confirmButtonText: 'Tamam',
+                    confirmButtonColor: '#e74c3c'
+                });
+            })
+            .finally(() => {
+                $('#submitBtn').prop('disabled', false);
             });
         }
+
+        function handleFormReset() {
+            Swal.fire({
+                title: 'Formu Sıfırla',
+                text: 'Tüm veriler silinecek. Emin misinz?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Sıfırla',
+                cancelButtonText: 'İptal',
+                confirmButtonColor: '#f39c12'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    resetForm();
+                }
+            });
+        }
+
+        function resetForm() {
+            // Reset form
+            $('#accidentForm')[0].reset();
+
+            // Reset checkboxes
+            $('.checkbox-item').removeClass('checked');
+            $('.checkbox-item input[type="checkbox"]').prop('checked', false);
+
+            // Reset selects
+            $('#workplaceSelect').prop('disabled', true);
+            $('#staffList').empty().append('<option disabled>Önce çalışma yeri seçiniz...</option>');
+            $('#contractList').empty();
+            $('#selectedEmployeeIds').val('');
+
+            // Reset validation states
+            $('.form-control, .form-select').removeClass('is-valid is-invalid');
+
+            // Set default date
+            setDefaultDate();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Sıfırlandı!',
+                text: 'Form başarıyla sıfırlandı.',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+
+        function saveDraft() {
+            const formData = {
+                accDate: $('#accDate').val(),
+                accTime: $('#accTime').val(),
+                storyOfAccident: $('#storyOfAccident').val(),
+                officeId: $('#officeSelect').val(),
+                workplaceId: $('#workplaceSelect').val(),
+                timestamp: new Date().toISOString()
+            };
+
+            localStorage.setItem('accidentFormDraft', JSON.stringify(formData));
+        }
+
+        function loadDraft() {
+            const draft = localStorage.getItem('accidentFormDraft');
+            if (draft) {
+                const data = JSON.parse(draft);
+
+                Swal.fire({
+                    title: 'Taslak Bulundu',
+                    text: 'Daha önce kaydettiğiniz taslağı yüklemek ister misiniz?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Evet, Yükle',
+                    cancelButtonText: 'Hayır'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Load draft data
+                        $('#accDate').val(data.accDate);
+                        $('#accTime').val(data.accTime);
+                        $('#storyOfAccident').val(data.storyOfAccident);
+
+                        if (data.officeId) {
+                            $('#officeSelect').val(data.officeId).trigger('change');
+                        }
+                    }
+                });
+            }
+        }
+
+        // Load draft on page load
+        setTimeout(loadDraft, 1000);
     </script>
 }

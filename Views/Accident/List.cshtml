@@ -1,83 +1,278 @@
 ﻿<!DOCTYPE html>
 <html lang="tr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaza Listesi</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js" defer></script>
+    <title>Kaza Listesi - Güvenport İSG Sistemi</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/accident-list.css">
 </head>
 
 <body>
-    <div class="container mt-5">
-        <h1>Kaza Listesi</h1>
-        <table id="accidentTable" class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Tarih</th>
-                    <th>Saat</th>
-                    <th>Ölüm Durumu</th>
-                    <th>Açıklama</th>
-                    <th>Çalışma Yeri</th>
-                    <th>İşlemler</th>
-                </tr>
-            </thead>
-            <tbody id="accidentTableBody">
+    <div class="container">
+        <div class="main-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1><i class="fas fa-exclamation-triangle me-2"></i>Kaza Listesi</h1>
+                <p>Sistemde kayıtlı tüm kazaları görüntüleyin, düzenleyin veya silin</p>
+            </div>
+            
+            <!-- Content Wrapper -->
+            <div class="content-wrapper">
+                <!-- Stats Row -->
+                <div class="row stats-row">
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="stats-card stats-card-total">
+                            <div class="stats-card-body">
+                                <div class="stats-icon">
+                                    <i class="fas fa-clipboard-list"></i>
+                                </div>
+                                <div class="stats-content">
+                                    <h3 id="totalAccidents">0</h3>
+                                    <p>Toplam Kaza</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="stats-card stats-card-fatal">
+                            <div class="stats-card-body">
+                                <div class="stats-icon">
+                                    <i class="fas fa-skull-crossbones"></i>
+                                </div>
+                                <div class="stats-content">
+                                    <h3 id="fatalAccidents">0</h3>
+                                    <p>Ölümcül Kaza</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="stats-card stats-card-recent">
+                            <div class="stats-card-body">
+                                <div class="stats-icon">
+                                    <i class="fas fa-calendar-day"></i>
+                                </div>
+                                <div class="stats-content">
+                                    <h3 id="recentAccidents">0</h3>
+                                    <p>Bu Ay</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
-            </tbody>
-        </table>
+                <!-- Table Card -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h3><i class="fas fa-table me-2"></i>Kaza Kayıtları</h3>
+                                <p>Detaylı kaza bilgileri ve işlemler</p>
+                            </div>
+                            <div>
+                                <button class="btn btn-success" onclick="refreshAccidents()">
+                                    <i class="fas fa-sync-alt"></i> Yenile
+                                </button>
+                                <a href="/accident/create" class="btn btn-primary ms-2">
+                                    <i class="fas fa-plus"></i> Yeni Kaza
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table id="accidentTable" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>Saat</th>
+                                    <th>Ölüm Durumu</th>
+                                    <th>Açıklama</th>
+                                    <th>Çalışma Yeri</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="accidentTableBody">
+                                <!-- Loading state -->
+                                <tr>
+                                    <td colspan="6" class="loading">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Yükleniyor...</span>
+                                        </div>
+                                        <br><br>
+                                        <p class="mb-0">Kaza kayıtları yükleniyor...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    
     <script>
         $(document).ready(function () {
-            
             fetchAccidents();
         });
 
+        let accidentTable;
+        let accidentData = [];
+
         function fetchAccidents() {
             const token = Cookies.get('authToken');
+            
+            // Show loading
+            $('#accidentTableBody').html(`
+                <tr>
+                    <td colspan="7" class="loading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Yükleniyor...</span>
+                        </div>
+                        <br><br>
+                        <p class="mb-0">Kaza kayıtları yükleniyor...</p>
+                    </td>
+                </tr>
+            `);
+
             $.ajax({
                 url: 'https://localhost:44384/api/accident/ListAccidents',
                 method: 'GET',
                 dataType: 'json',
                 headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                },
                 success: function (data) {
-                    const tableBody = $('#accidentTableBody');
-                    tableBody.empty();
+                    accidentData = data;
+                    updateStats(data);
+                    
+                    if (data.length === 0) {
+                        showEmptyState();
+                        return;
+                    }
 
                     const rowPromises = data.map(function (accident) {
                         return fetchWorkplaceName(accident.idWorkplace).then(function (workplaceName) {
-                            return `
-                                <tr>
-                                    <td>${accident.id}</td>
-                                    <td>${accident.accDate}</td>
-                                    <td>${accident.accTime}</td>
-                                    <td>${accident.fatality ? 'Evet' : 'Hayır'}</td>
-                                    <td>${accident.storyOfAccident}</td>
-                                    <td>${workplaceName}</td>
-                                    <td>
-                                        <button class="btn btn-primary btn-sm" onclick="updateAccident(${accident.id})">Güncelle</button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteAccident(${accident.id})">Sil</button>
-                                    </td>
-                                </tr>`;
+                            return createAccidentRow(accident, workplaceName);
                         });
                     });
 
                     Promise.all(rowPromises).then(function (rowsHtml) {
-                        tableBody.append(rowsHtml.join(''));
-                        $('#accidentTable').DataTable();
+                        const tableBody = $('#accidentTableBody');
+                        tableBody.html(rowsHtml.join(''));
+                        initializeDataTable();
+                        
+                        // Success animation
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Başarılı!',
+                            text: `${data.length} kaza kaydı yüklendi.`,
+                            showConfirmButton: false,
+                            timer: 1500,
+                            toast: true,
+                            position: 'top-end'
+                        });
                     });
                 },
                 error: function (xhr, status, error) {
-                    console.error('Hata:', error);
+                    console.error('API Error:', error);
+                    showErrorState();
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: 'Kaza kayıtları yüklenirken bir hata oluştu.',
+                        confirmButtonText: 'Tekrar Dene',
+                        confirmButtonColor: '#3498db'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetchAccidents();
+                        }
+                    });
                 }
             });
+        }
+
+                function createAccidentRow(accident, workplaceName) {
+            const date = new Date(accident.accDate);
+            const formattedDate = date.toLocaleDateString('tr-TR');
+            const time = accident.accTime || 'Belirtilmemiş';
+            const fatalityBadge = accident.fatality
+                ? '<span class="badge badge-danger"><i class="fas fa-skull-crossbones me-1"></i>Ölümcül</span>'
+                : '<span class="badge badge-success"><i class="fas fa-check-circle me-1"></i>Yaralanma</span>';
+
+            const description = accident.storyOfAccident && accident.storyOfAccident.length > 50
+                ? accident.storyOfAccident.substring(0, 50) + '...'
+                : accident.storyOfAccident || 'Açıklama yok';
+
+            return `
+                <tr data-accident-id="${accident.id}">
+                    <td>
+                        <i class="fas fa-calendar me-1 text-muted"></i>
+                        ${formattedDate}
+                    </td>
+                    <td>
+                        <i class="fas fa-clock me-1 text-muted"></i>
+                        ${time}
+                    </td>
+                    <td>${fatalityBadge}</td>
+                    <td>
+                        <span title="${accident.storyOfAccident || 'Açıklama yok'}" data-bs-toggle="tooltip">
+                            ${description}
+                        </span>
+                    </td>
+                    <td>
+                        <i class="fas fa-building me-1 text-muted"></i>
+                        ${workplaceName}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-warning btn-sm" onclick="updateAccident(${accident.id})" title="Düzenle" data-bs-toggle="tooltip">
+                                <i class="fas fa-edit"></i> <span class="d-none d-md-inline">Düzenle</span>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteAccident(${accident.id})" title="Sil" data-bs-toggle="tooltip">
+                                <i class="fas fa-trash"></i> <span class="d-none d-md-inline">Sil</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
         }
 
         function fetchWorkplaceName(id) {
@@ -86,36 +281,281 @@
                 url: `https://localhost:44384/api/workplace/GetWorkplaceName/${id}`,
                 method: 'GET',
                 headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            }
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'text/plain'
+                }
+            }).fail(function() {
+                return 'Bilinmiyor';
             });
         }
-        a
+
+        function updateStats(data) {
+            const total = data.length;
+            const fatal = data.filter(acc => acc.fatality).length;
+            
+            // This month's accidents
+            const thisMonth = new Date();
+            const recent = data.filter(acc => {
+                const accDate = new Date(acc.accDate);
+                return accDate.getMonth() === thisMonth.getMonth() && 
+                       accDate.getFullYear() === thisMonth.getFullYear();
+            }).length;
+            
+            // Animate counters
+            animateCounter('totalAccidents', total);
+            animateCounter('fatalAccidents', fatal);
+            animateCounter('recentAccidents', recent);
+        }
+
+        function animateCounter(elementId, targetValue) {
+            const element = $(`#${elementId}`);
+            const startValue = 0;
+            const duration = 1500;
+            const startTime = performance.now();
+            
+            function updateCounter(currentTime) {
+                const elapsedTime = currentTime - startTime;
+                const progress = Math.min(elapsedTime / duration, 1);
+                const currentValue = Math.floor(progress * targetValue);
+                
+                element.text(currentValue);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateCounter);
+                }
+            }
+            
+            requestAnimationFrame(updateCounter);
+        }
+
+                function initializeDataTable() {
+            if (accidentTable) {
+                accidentTable.destroy();
+            }
+
+            accidentTable = $('#accidentTable').DataTable({
+                responsive: true,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json',
+                    search: "Ara:",
+                    lengthMenu: "Sayfada _MENU_ kayıt göster",
+                    info: "Toplam _TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor",
+                    infoEmpty: "Kayıt bulunamadı",
+                    infoFiltered: "(_MAX_ kayıt içinden filtrelendi)",
+                    paginate: {
+                        first: "İlk",
+                        last: "Son",
+                        next: "Sonraki",
+                        previous: "Önceki"
+                    },
+                    processing: '<i class="fas fa-spinner fa-spin"></i> İşleniyor...',
+                    emptyTable: "Henüz kaza kaydı bulunmamaktadır"
+                },
+                dom: '<"row"<"col-sm-12 col-md-4"l><"col-sm-12 col-md-4"B><"col-sm-12 col-md-4"f>>' +
+                     '<"row"<"col-sm-12"tr>>' +
+                     '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                pageLength: 10,
+                lengthMenu: [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+                order: [[0, 'desc']], // İlk sütun (Tarih) olarak değişti
+                processing: true,
+                columnDefs: [
+                    { targets: [5], orderable: false }, // İşlemler sütunu (index 5)
+                    { targets: [3], width: '25%' }, // Açıklama sütunu (index 3)
+                    { targets: [0, 1, 2], responsivePriority: 1 }, // Tarih, Saat, Ölüm Durumu
+                    { targets: [5], responsivePriority: 2 } // İşlemler
+                ],
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel me-1"></i>Excel',
+                        className: 'dt-button buttons-excel',
+                        title: 'Kaza Listesi',
+                        exportOptions: {
+                            columns: ':visible:not(:last-child)'
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fas fa-file-pdf me-1"></i>PDF',
+                        className: 'dt-button buttons-pdf',
+                        title: 'Kaza Listesi',
+                        orientation: 'landscape',
+                        pageSize: 'A4',
+                        exportOptions: {
+                            columns: ':visible:not(:last-child)'
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print me-1"></i>Yazdır',
+                        className: 'dt-button buttons-print',
+                        title: 'Kaza Listesi',
+                        exportOptions: {
+                            columns: ':visible:not(:last-child)'
+                        }
+                    }
+                ],
+                drawCallback: function() {
+                    $('[data-bs-toggle="tooltip"]').tooltip();
+                },
+                initComplete: function() {
+                    $('.dataTables_filter input').attr('placeholder', 'Kaza kayıtlarında ara...');
+                }
+            });
+        }
+
+                function showEmptyState() {
+            $('#accidentTableBody').html(`
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h5>Henüz kaza kaydı bulunmuyor</h5>
+                        <p>Yeni bir kaza kaydı eklemek için "Yeni Kaza" butonunu kullanabilirsiniz.</p>
+                        <a href="/accident/create" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>İlk Kaza Kaydını Ekle
+                        </a>
+                    </td>
+                </tr>
+            `);
+        }
+
+        function showErrorState() {
+            $('#accidentTableBody').html(`
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        <i class="fas fa-exclamation-triangle text-danger" style="color: #e74c3c !important;"></i>
+                        <h5>Veri Yüklenirken Hata Oluştu</h5>
+                        <p>Kaza kayıtları yüklenirken bir sorun oluştu. Lütfen tekrar deneyin.</p>
+                        <button class="btn btn-primary" onclick="fetchAccidents()">
+                            <i class="fas fa-sync-alt me-2"></i>Tekrar Dene
+                        </button>
+                    </td>
+                </tr>
+            `);
+        }
+
+        function refreshAccidents() {
+            const button = event.target.closest('button');
+            const originalHtml = button.innerHTML;
+            
+            // Show loading on button
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yenileniyor...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                fetchAccidents();
+                button.innerHTML = originalHtml;
+                button.disabled = false;
+            }, 500);
+        }
+
         function updateAccident(id) {
-            alert(`Güncelleme fonksiyonu tetiklendi. ID: ${id}`);
+            Swal.fire({
+                title: 'Kaza Kaydını Düzenle',
+                text: `ID: ${id} numaralı kaza kaydını düzenlemek istediğinize emin misiniz?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Düzenle',
+                cancelButtonText: 'İptal',
+                confirmButtonColor: '#f39c12',
+                cancelButtonColor: '#6c757d'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect to edit page
+                    window.location.href = `/accident/edit/${id}`;
+                }
+            });
         }
 
         function deleteAccident(id) {
-            const token = Cookies.get('authToken');
-            if (confirm('Bu kazayı silmek istediğinize emin misiniz?')) {
-                $.ajax({
-                    url: `https://localhost:44384/api/accident/DeleteAccident/${id}`,
-                    method: 'DELETE',
-                    headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'text/plain'
-            },
-                    success: function () {
-                        alert('Kaza başarıyla silindi!');
-                        fetchAccidents();
-                    },
-                    error: function () {
-                        alert('Silme işlemi sırasında hata oluştu.');
-                    }
-                });
-            }
+            const accident = accidentData.find(acc => acc.id === id);
+            const accidentDate = accident ? new Date(accident.accDate).toLocaleDateString('tr-TR') : '';
+            
+            Swal.fire({
+                title: 'Kaza Kaydını Sil',
+                html: `
+                    <div class="text-start">
+                        <p><strong>ID:</strong> #${id}</p>
+                        ${accidentDate ? `<p><strong>Tarih:</strong> ${accidentDate}</p>` : ''}
+                        <p class="text-danger mt-3"><i class="fas fa-exclamation-triangle me-2"></i>Bu işlem geri alınamaz!</p>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Sil',
+                cancelButtonText: 'İptal',
+                confirmButtonColor: '#e74c3c',
+                cancelButtonColor: '#6c757d',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    performDelete(id);
+                }
+            });
         }
+
+        function performDelete(id) {
+            const token = Cookies.get('authToken');
+            
+            Swal.fire({
+                title: 'Siliniyor...',
+                text: 'Lütfen bekleyin',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            $.ajax({
+                url: `https://localhost:44384/api/accident/DeleteAccident/${id}`,
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'text/plain'
+                },
+                success: function () {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Başarılı!',
+                        text: 'Kaza kaydı başarıyla silindi.',
+                        confirmButtonText: 'Tamam',
+                        confirmButtonColor: '#27ae60'
+                    }).then(() => {
+                        // Remove row with animation
+                        const row = $(`tr[data-accident-id="${id}"]`);
+                        row.fadeOut(300, function() {
+                            fetchAccidents(); // Refresh the table
+                        });
+                    });
+                },
+                error: function (xhr) {
+                    let errorMessage = 'Silme işlemi sırasında bir hata oluştu.';
+                    
+                    if (xhr.responseText) {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            errorMessage = response.message || errorMessage;
+                        } catch (e) {
+                            errorMessage = xhr.responseText;
+                        }
+                    }
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: errorMessage,
+                        confirmButtonText: 'Tamam',
+                        confirmButtonColor: '#e74c3c'
+                    });
+                }
+            });
+        }
+
+        // Initialize tooltips on page load
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
     </script>
 </body>
 </html>

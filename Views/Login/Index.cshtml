@@ -1,21 +1,55 @@
 ﻿@{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Giriş Yap";
+    Layout = "_Layout";
 }
-<h2>Login</h2>
-<form method="post" style="max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); background-color: #fff;">
-    <div style="margin-bottom: 15px;">
-        <label for="Mail" style="display: block; margin-bottom: 5px;">Mail</label>
-        <input type="text" name="Mail" id="Mail" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;" />
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-logo">
+                <img src="~/gp2.png" alt="Güvenport Logo" />
+            </div>
+            <h2 class="login-title">Güvenport İSG</h2>
+            <p class="login-subtitle">Hesabınıza giriş yapın</p>
+        </div>
+
+        <form method="post" class="login-form">
+            <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="Mail" name="Mail" placeholder="E-posta" required />
+                <label for="Mail"><i class="fas fa-envelope me-2"></i>E-posta</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="Password" name="Password" placeholder="Şifre" required />
+                <label for="Password"><i class="fas fa-lock me-2"></i>Şifre</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-login w-100 mb-3">
+                <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap
+            </button>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Hata!</strong> @ViewBag.Error
+                </div>
+            }
+        </form>
+
+        <div class="login-footer">
+            <div class="text-center">
+                <a href="#" class="forgot-password-link">
+                    <i class="fas fa-question-circle me-1"></i>Şifremi unuttum
+                </a>
+            </div>
+        </div>
     </div>
-    <div style="margin-bottom: 15px;">
-        <label for="Password" style="display: block; margin-bottom: 5px;">Password</label>
-        <input type="password" name="Password" id="Password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;" />
+
+    <div class="login-bg-animation">
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+        <div class="floating-shape shape-3"></div>
+        <div class="floating-shape shape-4"></div>
     </div>
-    <button type="submit" style="width: 100%; padding: 10px; border: none; border-radius: 5px; background-color: #5cb85c; color: white; font-size: 16px; cursor: pointer; transition: background-color 0.3s;">
-        Login
-    </button>
-    @if (ViewBag.Error != null)
-    {
-        <div style="color:red; margin-top: 15px;">@ViewBag.Error</div>
-    }
-</form>
+</div>
